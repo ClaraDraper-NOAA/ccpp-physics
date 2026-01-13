@@ -921,6 +921,7 @@
            if(errflg /= 0) return
          endif
 
+! CSD - todo: remove cvb, cvt, and cv from this routine.
 !> - Call gcycle() to repopulate specific time-varying surface properties for AMIP/forecast runs
          if (nscyc >  0) then
            if (mod(kdt,nscyc) == 1) THEN
@@ -930,7 +931,7 @@
                  frac_grid, smc, slc, stc, smois, sh2o, tslb, tiice, tg3, tref, tsfc,        &
                  tsfco, tisfc, hice, fice, facsf, facwf, alvsf, alvwf, alnsf, alnwf,         &
                  zorli, zorll, zorlo, weasd, slope, snoalb, canopy, vfrac, vtype,            &
-                 stype, scolor, shdmin, shdmax, snowd, cv, cvb, cvt, oro, oro_uf,            &
+                 stype, scolor, shdmin, shdmax, snowd, oro, oro_uf,                          &
                  cplflx, oceanfrac,                                                          &
                  xlat_d, xlon_d, slmsk, imap, jmap, errmsg, errflg)
            endif
