@@ -73,7 +73,7 @@
      &,                   tsffcs,snofcs,zorfcs,albfcs,tg3fcs            &
      &,                   cnpfcs,smcfcs,stcfcs,slifcs,aisfcs            &
      &,                   vegfcs,vetfcs,sotfcs,socfcs,alffcs            &
-     &,                   cvfcs,cvbfcs,cvtfcs,me,nthrds,nlunit          &
+     &,                   me,nthrds,nlunit                              &
      &,                   sz_nml,input_nml_file                         &
      &,                   min_ice                                       &
      &,                   ialb,isot,ivegsrc,tile_num_ch,i_index,j_index)
@@ -125,7 +125,7 @@
      &                     aislim,snwmin,snwmax,cplrl,cplrs,            &
      &                     cvegl,czors,csnol,csnos,czorl,csots,         &
      &                     csotl,csocs,csocl,cvwgs,cvetl,cvets,calfs,   &
-     &                     fcalfl,fcalfs,ccvt,ccnp,ccv,ccvb,            &
+     &                     fcalfl,fcalfs,ccnp,                          &
      &                     calbl,calfl,calbs,ctsfs,grboro,              &
      &                     grbmsk,ctsfl,deltf,caisl,caiss,              &
      &                     fsalfl,fsalfs,flalfs,falbl,ftsfl,            &
@@ -402,7 +402,6 @@
       real (kind=kind_io8) tsfclm(len), wetclm(len),   snoclm(len)      &
      &,    zorclm(len), albclm(len,4), aisclm(len)                      &
      &,    tg3clm(len), acnclm(len),   cnpclm(len)                      &
-     &,    cvclm (len), cvbclm(len),   cvtclm(len)                      &
      &,    scvclm(len), tsfcl2(len),   vegclm(len)                      &
      &, vetclm(len), sotclm(len), socclm(len),alfclm(len,2), sliclm(len)&
      &,    smcclm(len,lsoil), stcclm(len,lsoil)                         &
@@ -416,7 +415,6 @@
       real (kind=kind_io8) tsfanl(len), wetanl(len),   snoanl(len)      &
      &,    zoranl(len), albanl(len,4), aisanl(len)                      &
      &,    tg3anl(len), acnanl(len),   cnpanl(len)                      &
-     &,    cvanl (len), cvbanl(len),   cvtanl(len)                      &
      &,    scvanl(len), tsfan2(len),   veganl(len)                      &
      &,    vetanl(len), sotanl(len),   socanl(len)                      &
      &,    alfanl(len,2), slianl(len)                                   &
@@ -585,7 +583,7 @@
       data iczorl/1/, iczors/0/
       data icplrl/1/, icplrs/0/
       data ccnp/1.0/
-      data ccv/1.0/,   ccvb/1.0/, ccvt/1.0/
+
       data ifp/0/
       save ifp,fnglac,fnmxic,
      &     fntsfc,fnwetc,fnsnoc,fnzorc,fnalbc,fnaisc,
@@ -882,7 +880,7 @@
      &           fnvetc,fnsotc,fnsocc,                   
      &           fnvmnc,fnvmxc,fnslpc,fnabsc,
      &           tsfclm,tsfcl2,wetclm,snoclm,zorclm,albclm,aisclm,
-     &           tg3clm,cvclm ,cvbclm,cvtclm,
+     &           tg3clm,
      &           cnpclm,smcclm,stcclm,sliclm,scvclm,acnclm,vegclm,
      &           vetclm,sotclm,socclm,alfclm,           
      &           vmnclm,vmxclm,slpclm,absclm,
@@ -1077,9 +1075,7 @@
         enddo
         call monitr('tg3clm',tg3clm,sliclm,snoclm,len)
         call monitr('zorclm',zorclm,sliclm,snoclm,len)
-        call monitr('cvaclm',cvclm ,sliclm,snoclm,len)
-        call monitr('cvbclm',cvbclm,sliclm,snoclm,len)
-        call monitr('cvtclm',cvtclm,sliclm,snoclm,len)
+
         call monitr('sliclm',sliclm,sliclm,snoclm,len)
         call monitr('orog  ',orog  ,sliclm,snoclm,len)
         call monitr('vegclm',vegclm,sliclm,snoclm,len)
@@ -1882,9 +1878,6 @@
         zorfcs(i) = zoranl(i)
         slifcs(i) = slianl(i)
         aisfcs(i) = aisanl(i)
-        cvfcs(i)  = cvanl(i)
-        cvbfcs(i) = cvbanl(i)
-        cvtfcs(i) = cvtanl(i)
         cnpfcs(i) = cnpanl(i)
         vegfcs(i) = veganl(i)
         vetfcs(i) = vetanl(i)
@@ -2890,9 +2883,6 @@
         vetanl(i)   = vetclm(i)      !  vegetation type
         sotanl(i)   = sotclm(i)      !  soil type
         socanl(i)   = socclm(i)      !  soil color
-        cvanl(i)    = cvclm(i)       !  cv
-        cvbanl(i)   = cvbclm(i)      !  cvb
-        cvtanl(i)   = cvtclm(i)      !  cvt
         sihanl(i)   = sihclm(i)      !  sea ice thickness
         sicanl(i)   = sicclm(i)      !  sea ice concentration
         vmnanl(i)   = vmnclm(i)      !  min vegetation cover
@@ -3606,9 +3596,6 @@
         zorfcs(i)   = zoranl(i)      !  surface roughness
         tg3fcs(i)   = tg3anl(i)      !  deep soil temperature
         cnpfcs(i)   = cnpanl(i)      !  canopy water content
-        cvfcs(i)    = cvanl(i)       !  cv
-        cvbfcs(i)   = cvbanl(i)      !  cvb
-        cvtfcs(i)   = cvtanl(i)      !  cvt
         vegfcs(i)   = veganl(i)      !  vegetation cover
         vetfcs(i)   = vetanl(i)      !  vegetation type
         sotfcs(i)   = sotanl(i)      !  soil type
@@ -3844,10 +3831,10 @@
      &,       irtvmn,irtvmx,irtslp,irtabs
       logical, intent(in)  :: landice
       real (kind=kind_io8) rvegs,rvets,rzors,raiss,rsnos,rsots,rsocs,   &
-     &                     rcnp,rcvt,rcv,rcvb,rsnol,rzorl,raisl,ralbl,  &
+     &                     rcnp,rsnol,rzorl,raisl,ralbl,                &
      &                 ralfl,rvegl,ralbs,ralfs,rtsfs,rvetl,rsotl,rsocl, &
-     &                     qzors,qvegs,qsnos,qalfs,qaiss,qvets,qcvt,    &
-     &                    qcnp,qcvb,qsots,qsocs,qcv,qaisl,qsnol,qalfl,  &
+     &                     qzors,qvegs,qsnos,qalfs,qaiss,qvets,         &
+     &                    qcnp,qsots,qsocs,qaisl,qsnol,qalfl,           &
      &               qtsfl,qalbl,qzorl,qtsfs,qalbs,qsotl,qsocl,qvegl,   &
      &                     qvetl,rtsfl,calbs,caiss,ctsfs,czorl,cvegl,   &
      &                     csnos,ccvb,ccvt,ccv,czors,cvegs,caisl,csnol, &
@@ -3932,9 +3919,7 @@
       rvmxs = cvmxs
       rslps = cslps
       rabss = cabss
-      rcv  = ccv
-      rcvb = ccvb
-      rcvt = ccvt
+
       rcnp = ccnp
       do k=1,lsoil
         rsmcl(k) = csmcl(k)
@@ -4071,9 +4056,7 @@
       qvmxs = 1. - rvmxs
       qslps = 1. - rslps
       qabss = 1. - rabss
-      qcv   = 1. - rcv
-      qcvb  = 1. - rcvb
-      qcvt  = 1. - rcvt
+
       qcnp  = 1. - rcnp
       do k=1,lsoil
         qsmcl(k) = 1. - rsmcl(k)
@@ -4173,11 +4156,7 @@
         enddo
       endif
 
-      do i=i1_t,i2_t
-        cvanl(i)  = cvfcs(i)*rcv   + cvanl(i)*qcv
-        cvbanl(i) = cvbfcs(i)*rcvb + cvbanl(i)*qcvb
-        cvtanl(i) = cvtfcs(i)*rcvt + cvtanl(i)*qcvt
-      enddo
+
       do k = 1, 4
         do i=i1_t,i2_t
           if (nint(slianl(i)) == 0) then

@@ -21,7 +21,7 @@ contains
       frac_grid, smc, slc, stc, smois, sh2o, tslb, tiice, tg3, tref, tsfc,         &
       tsfco, tisfc, hice, fice, facsf, facwf, alvsf, alvwf, alnsf, alnwf,          &
       zorli, zorll, zorlo, weasd, slope, snoalb, canopy, vfrac, vtype,             &
-      stype, scolor, shdmin, shdmax, snowd, cv, cvb, cvt, oro, oro_uf,             &
+      stype, scolor, shdmin, shdmax, snowd, oro, oro_uf,                           &
       cplflx, oceanfrac,                                                           &
       xlat_d, xlon_d, slmsk, imap, jmap, errmsg, errflg)
 !
@@ -70,9 +70,6 @@ contains
                                            shdmin(:),  &
                                            shdmax(:),  &
                                            snowd(:),   &
-                                           cv(:),      &
-                                           cvb(:),     &
-                                           cvt(:),     &
                                            oro(:),     &
                                            oro_uf(:),  &
                                            slmsk(:)
@@ -268,8 +265,8 @@ contains
                      shdmin, shdmax, slpfcs, snoalb, tsffcs,         &
                      weasd, zorfcs, albfc1, tg3, canopy,             &
                      smcfc1, stcfc1, slmsk, aisfcs,                  &
-                     vfrac, vegfcs, sltfcs, slcfcs,alffc1, cv,       &   !slcfcs: soil color
-                     cvb, cvt, me, nthrds,                           &
+                     vfrac, vegfcs, sltfcs, slcfcs,alffc1,           &   !slcfcs: soil color
+                     me, nthrds,                                     &
                      nlunit, size(input_nml_file), input_nml_file,   &
                      min_ice, ialb, isot, ivegsrc,                   &
                      trim(tile_num_ch), i_indx, j_indx)
