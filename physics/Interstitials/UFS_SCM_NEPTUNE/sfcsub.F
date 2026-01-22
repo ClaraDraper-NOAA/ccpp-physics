@@ -128,14 +128,13 @@
      &                     fcalfl,fcalfs,ccvt,ccnp,ccv,ccvb,            &
      &                     calbl,calfl,calbs,ctsfs,grboro,              &
      &                     grbmsk,ctsfl,deltf,caisl,caiss,              &
-     &                     fsalfl,fsalfs,flalfs,falbl,ftsfl,            &
+     &                     falbl,ftsfl,                                 &
      &                     ftsfs,fzorl,fzors,fplrl,fsnos,faisl,         &
      &                     faiss,fsnol,bltmsk,falbs,cvegs,percrit,      &
      &                     deltsfc,critp2,critp3,blnmsk,critp1,         &
-     &                     fcplrl,fcplrs,fczors,fvets,fsotl,fsots,      &
+     &                     fvets,fsotl,fsots,                           &
      &                     fsocl,fsocs,                                 &
-     &                     fvetl,fplrs,fvegl,fvegs,fcsnol,fcsnos,       &
-     &                     fczorl,fcalbs,fctsfl,fctsfs,fcalbl,          &
+     &                     fvetl,fplrs,fvegl,fvegs,                     &
      &                     falfs,falfl,fh,crit,zsca,ztsfc,tem1,tem2     &
      &,                    fsihl,fsihs,fsicl,fsics,                     &
      &                     csihl,csihs,csicl,csics,epssih,epssic        &
@@ -396,7 +395,7 @@
 !     tsfcl0 is the climatological tsf at fh=0
 !  climatology surface fields (last character 'c' or 'clm' indicate climatology)
       character*500 fntsfc,fnwetc,fnsnoc,fnzorc,fnalbc,fnaisc           &
-     &,             fnplrc,fntg3c,fnscvc,fnsmcc,fnstcc,fnacnc           &
+     &,             fntg3c,fnscvc,fnsmcc,fnstcc,fnacnc                  &
      &,             fnvegc,fnvetc,fnsotc,fnsocc                         &
      &,             fnvmnc,fnvmxc,fnslpc,fnabsc, fnalbc2
       real (kind=kind_io8) tsfclm(len), wetclm(len),   snoclm(len)      &
@@ -410,7 +409,7 @@
      &,    vmnclm(len), vmxclm(len), slpclm(len), absclm(len)
 !  analyzed surface fields (last character 'a' or 'anl' indicate analysis)
       character*500 fntsfa,fnweta,fnsnoa,fnzora,fnalba,fnaisa           &
-     &,             fnplra,fntg3a,fnscva,fnsmca,fnstca,fnacna           &
+     &,             fntg3a,fnscva,fnsmca,fnstca,fnacna                  &
      &,             fnvega,fnveta,fnsota,fnsoca                         &
      &,             fnvmna,fnvmxa,fnslpa,fnabsa
       real (kind=kind_io8) tsfanl(len), wetanl(len),   snoanl(len)      &
@@ -427,7 +426,7 @@
 !  predicted surface fields (last characters 'fcs' indicates forecast)
       real (kind=kind_io8) tsffcs(len), wetfcs(len),   snofcs(len)      &
      &,    zorfcs(len), albfcs(len,4), aisfcs(len)                      &
-     &,    tg3fcs(len), acnfcs(len),   cnpfcs(len)                      &
+     &,    tg3fcs(len), cnpfcs(len)                                     &
      &,    cvfcs (len), cvbfcs(len),   cvtfcs(len)                      &
      &,    slifcs(len), vegfcs(len)                                     &
      &,    vetfcs(len), sotfcs(len), socfcs(len),   alffcs(len,2)       &
@@ -435,15 +434,10 @@
      &,    sihfcs(len), sicfcs(len), sitfcs(len)                        &
      &,    vmnfcs(len), vmxfcs(len), slpfcs(len), absfcs(len)           &
      &,    swdfcs(len), slcfcs(len,lsoil)
-! ratio of sigma level 1 wind and 10m wind (diagnozed by model and not touched
-! in this program).
-      real (kind=kind_io8) f10m  (len)
       real (kind=kind_io8) fsmcl(25), fsmcs(25), fstcl(25), fstcs(25)
-      real (kind=kind_io8) fcsmcl(25),fcsmcs(25),fcstcl(25),fcstcs(25)
 
       real (kind=kind_io8) swratio(len,lsoil)
       logical fixratio(lsoil)
-      integer icsmcl(25), icsmcs(25), icstcl(25), icstcs(25)
       real (kind=kind_io8) csmcl(25), csmcs(25)
       real (kind=kind_io8) cstcl(25), cstcs(25)
       real (kind=kind_io8) slmskh(mdata)
@@ -458,7 +452,6 @@
      &                                        smcfcsd, stcfcsd, albfcsd
 !  sigma level 1 temperature for dead start
       real (kind=kind_io8) sig1t(len)
-      character*32 label
 
 !  debug only
 !   ldebug=.true. creates bges files for climatology and analysis
@@ -471,11 +464,11 @@
 
       namelist/namsfc/fnglac,fnmxic,
      &                fntsfc,fnwetc,fnsnoc,fnzorc,fnalbc,fnaisc,
-     &                fnplrc,fntg3c,fnscvc,fnsmcc,fnstcc,fnacnc,
+     &                fntg3c,fnscvc,fnsmcc,fnstcc,fnacnc,
      &                fnvegc,fnvetc,fnsotc,fnsocc,fnalbc2,    
      &                fnvmnc,fnvmxc,fnslpc,fnabsc,
      &                fntsfa,fnweta,fnsnoa,fnzora,fnalba,fnaisa,
-     &                fnplra,fntg3a,fnscva,fnsmca,fnstca,fnacna,
+     &                fntg3a,fnscva,fnsmca,fnstca,fnacna,
      &                fnvega,fnveta,fnsota,fnsoca,           
      &                fnvmna,fnvmxa,fnslpa,fnabsa,
      &                fnmskh,
@@ -486,15 +479,11 @@
      &                fzorl,fzors,fplrl,fplrs,fsmcl,fsmcs,
      &                fstcl,fstcs,fvegl,fvegs,fvetl,fvets,fsotl,fsots,
      &                fsocl,fsocs,                          
-     &                fctsfl,fctsfs,fcalbl,fcalbs,fcsnol,fcsnos,
-     &                fczorl,fczors,fcplrl,fcplrs,fcsmcl,fcsmcs,
-     &                fcstcl,fcstcs,fsalfl,fsalfs,fcalfl,flalfs,
      &                fsihl,fsicl,fsihs,fsics,aislim,sihnew,
      &                fvmnl,fvmns,fvmxl,fvmxs,fslpl,fslps,
      &                fabsl,fabss,
      &                ictsfl,ictsfs,icalbl,icalbs,icsnol,icsnos,
-     &                iczorl,iczors,icplrl,icplrs,icsmcl,icsmcs,
-     &                icstcl,icstcs,icalfl,icalfs,
+     &                iczorl,iczors,icplrl,icplrs,icalfl,icalfs,
      &                gausm,  deads,
      &                monclm, monanl, monfcs, monmer, mondif, igrdbg,
      &                blnmsk, bltmsk, landice
@@ -523,7 +512,6 @@
       data fnslpc/'global_slope.1x1.grb'/
       data fnabsc/'global_snoalb.1x1.grb'/
       data fnwetc/'        '/
-      data fnplrc/'        '/
       data fnstcc/'        '/
       data fnscvc/'        '/
       data fnacnc/'        '/
@@ -533,7 +521,6 @@
       data fnzora/'        '/
       data fnalba/'        '/
       data fnaisa/'        '/
-      data fnplra/'        '/
       data fntg3a/'        '/
       data fnsmca/'        '/
       data fnstca/'        '/
@@ -571,12 +558,6 @@
       data fvmxl/0.0/,      fvmxs/99999.0/
       data fslpl/0.0/,      fslps/99999.0/
       data fabsl/0.0/,      fabss/99999.0/
-!  default relaxation time in hours to climatology if analysis missing
-      data fctsfl/99999.0/, fctsfs/99999.0/
-      data fcalbl/99999.0/, fcalbs/99999.0/
-      data fcsnol/99999.0/, fcsnos/99999.0/
-      data fczorl/99999.0/, fczors/99999.0/
-      data fcplrl/99999.0/, fcplrs/99999.0/
 !  default flag to apply climatological annual cycle
       data ictsfl/0/, ictsfs/1/
       data icalbl/1/, icalbs/1/
@@ -589,9 +570,9 @@
       data ifp/0/
       save ifp,fnglac,fnmxic,
      &     fntsfc,fnwetc,fnsnoc,fnzorc,fnalbc,fnaisc,
-     &     fnplrc,fntg3c,fnscvc,fnsmcc,fnstcc,fnacnc,fnvegc,
+     &     fntg3c,fnscvc,fnsmcc,fnstcc,fnacnc,fnvegc,
      &     fntsfa,fnweta,fnsnoa,fnzora,fnalba,fnaisa,
-     &     fnplra,fntg3a,fnscva,fnsmca,fnstca,fnacna,fnvega,
+     &     fntg3a,fnscva,fnsmca,fnstca,fnacna,fnvega,
      &     fnvetc,fnveta,
      &     fnsotc,fnsota,
      &     fnsocc,fnsoca,
@@ -604,15 +585,11 @@
      &     fzorl,fzors,fplrl,fplrs,fsmcl,fsmcs,falfl,falfs,
      &     fstcl,fstcs,fvegl,fvegs,fvetl,fvets,fsotl,fsots,
      &     fsocl,fsocs,                   
-     &     fctsfl,fctsfs,fcalbl,fcalbs,fcsnol,fcsnos,
-     &     fczorl,fczors,fcplrl,fcplrs,fcsmcl,fcsmcs,
-     &     fcstcl,fcstcs,fcalfl,fcalfs,
      &     fsihl,fsihs,fsicl,fsics,aislim,sihnew,
      &     fvmnl,fvmns,fvmxl,fvmxs,fslpl,fslps,
      &     fabsl,fabss,
      &     ictsfl,ictsfs,icalbl,icalbs,icsnol,icsnos,
-     &     iczorl,iczors,icplrl,icplrs,icsmcl,icsmcs,
-     &     icstcl,icstcs,icalfl,icalfs,
+     &     iczorl,iczors,icplrl,icplrs,icalfl,icalfs,
      &     gausm, deads,
      &     monclm, monanl, monfcs, monmer, mondif, igrdbg,
      &     grboro, grbmsk,
