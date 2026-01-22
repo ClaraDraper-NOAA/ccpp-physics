@@ -591,7 +591,7 @@
      &     fabsl,fabss,
      &     ictsfl,ictsfs,icalbl,icalbs,icsnol,icsnos,
      &     iczorl,iczors,icplrl,icplrs,icalfl,icalfs,
-     &     gausm, deads,
+     &     gausm,
      &     monclm, monanl, monfcs, monmer, mondif, igrdbg,
      &     grboro, grbmsk,
      &     ctsfl,  ctsfs,  calbl, calfl, calbs, calfs, csmcs,
@@ -1420,8 +1420,8 @@
      &                albjmx,albjmn,albsmx,albsmn,epsalb,
      &                rla,rlo,len,kqcm,percrit,lgchek,me)
         enddo
-        if(fnwetc(1:8) /= '        ' .or. fnweta(1:8) /= '        ' )
-                                                        then
+        if(fnwetc(1:8) /= '        ' .or. fnweta(1:8) /= '        ' ) 
+     &     then
           call qcmxmn('wetf    ',wetfcs,slifcs,snofcs,icefl1,
      &                wetlmx,wetlmn,wetomx,wetomn,wetimx,wetimn,
      &                wetjmx,wetjmn,wetsmx,wetsmn,epswet,
