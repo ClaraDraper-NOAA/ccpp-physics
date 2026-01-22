@@ -452,17 +452,15 @@
       real (kind=kind_io8), allocatable, dimension(:,:) ::              &
      &                                        smcfcsd, stcfcsd, albfcsd
 
-!  debug only
-!   ldebug=.true. creates bges files for climatology and analysis
 !   lqcbgs=.true. quality controls input bges file before merging (should have been
 !              qced in the forecast program)
-      logical :: ldebug, lqcbgs, lprnt
-!  debug only
-      character*500 fndclm,fndanl
+      logical :: lqcbgs, lprnt
       logical lanom
 
-! CSD - to-do: variables removed from arguments
+! CSD - to-do: variables removed from argument
       real (kind=kind_io8) sig1t(len)
+! CSD - do-do: variabes to remove from namelist
+      logical :: ldebug 
 
       namelist/namsfc/fnglac,fnmxic,
      &                fntsfc,fnwetc,fnsnoc,fnzorc,fnalbc,fnaisc,
@@ -474,8 +472,7 @@
      &                fnvega,fnveta,fnsota,fnsoca,           
      &                fnvmna,fnvmxa,fnslpa,fnabsa,
      &                fnmskh,
-     &                ldebug,lgchek,lqcbgs,critp1,critp2,critp3,
-     &                fndclm,fndanl,
+     &                lgchek,lqcbgs,critp1,critp2,critp3,
      &                lanom,
      &                ftsfl,ftsfs,falbl,falbs,faisl,faiss,fsnol,fsnos,
      &                fzorl,fzors,fplrl,fplrs,fsmcl,fsmcs,
@@ -488,7 +485,12 @@
      &                iczorl,iczors,icplrl,icplrs,icalfl,icalfs,
      &                gausm,
      &                monclm, monanl, monfcs, monmer, mondif, igrdbg,
-     &                blnmsk, bltmsk, landice
+     &                blnmsk, bltmsk, landice,
+! CSD - namelist variables to delete
+     &                ldebug
+
+
+
       data gausm/.true./,blnmsk/0.0/, bltmsk/90.0/
      &,    igrdbg/-1/
      &,    monclm/.false./, monanl/.false./, monfcs/.false./
@@ -536,9 +538,7 @@
       data fnvmxa/'        '/
       data fnslpa/'        '/
       data fnabsa/'        '/
-      data ldebug/.false./, lqcbgs/.true./
-      data fndclm/'        '/
-      data fndanl/'        '/
+      data lqcbgs/.true./
       data lanom/.false./
 !  default relaxation time in hours to analysis or climatology
       data ftsfl/99999.0/,  ftsfs/0.0/
@@ -580,8 +580,7 @@
      &     fnsocc,fnsoca,
      &     fnvmnc,fnvmxc,fnabsc,fnslpc,
      &     fnvmna,fnvmxa,fnabsa,fnslpa,
-     &     ldebug,lgchek,lqcbgs,critp1,critp2,critp3,
-     &     fndclm,fndanl,
+     &     lgchek,lqcbgs,critp1,critp2,critp3,
      &     lanom,
      &     ftsfl,ftsfs,falbl,falbs,faisl,faiss,fsnol,fsnos,
      &     fzorl,fzors,fplrl,fplrs,fsmcl,fsmcs,falfl,falfs,
