@@ -50,9 +50,6 @@
 !!\param lugb   the unit number used in this subprogram
 !!\param len    number of points on which sfccyc operates
 !!\param lsoil  number of soil layers
-!!\param sig1t  sigma level 1 temperature for dead start. it should be on gaussian
-!!              grid. If not dead start, no need for dimension but set to zero as
-!!              in the example below.
 !!\param deltsfc       = fhcyc, frequcy for surface data cycling in hours
 !!\param iy,im,id,ih    year, month, day, and hour of initial state
 !!\param fh     forecast hour
@@ -64,6 +61,8 @@
 !!\param nst_anl
 !!
 
+! CSD - to do: remove from argument list: 
+! sig1t
       subroutine sfccycle(lugb,len,lsoil,sig1t,deltsfc                  &
      &,                   iy,im,id,ih,fh,rla,rlo                        &
      &,                   slmskl,slmskw,orog,orog_uf,use_ufo,nst_anl    &
@@ -77,6 +76,7 @@
      &,                   sz_nml,input_nml_file                         &
      &,                   min_ice                                       &
      &,                   ialb,isot,ivegsrc,tile_num_ch,i_index,j_index)
+
       use machine , only : kind_io8,kind_io4
       implicit none
       character(len=*),     intent(in) :: tile_num_ch
@@ -164,9 +164,10 @@
      &        ictsfl,iczors,icplrl,icplrs,iczorl,icalfs,icsnol,         &
      &        icsnos,irttg3,kqcm,nlunit,sz_nml,ialb                     &
      &,       irtvmn, irtvmx, irtslp, irtabs, isot, ivegsrc
-      logical gausm, deads, monclm, monanl,                             &
+      logical gausm, monclm, monanl,                                    &
      &        monfcs, monmer, mondif, landice
       character(len=*), intent(in) :: input_nml_file(sz_nml)
+
 !>  This is a limited point version of surface program.
 !!
 !!  this program runs in two different modes:
@@ -450,8 +451,6 @@
      &     vmnfcsd, vmxfcsd, slpfcsd, absfcsd
       real (kind=kind_io8), allocatable, dimension(:,:) ::              &
      &                                        smcfcsd, stcfcsd, albfcsd
-!  sigma level 1 temperature for dead start
-      real (kind=kind_io8) sig1t(len)
 
 !  debug only
 !   ldebug=.true. creates bges files for climatology and analysis
@@ -461,6 +460,9 @@
 !  debug only
       character*500 fndclm,fndanl
       logical lanom
+
+! CSD - to-do: variables removed from arguments
+      real (kind=kind_io8) sig1t(len)
 
       namelist/namsfc/fnglac,fnmxic,
      &                fntsfc,fnwetc,fnsnoc,fnzorc,fnalbc,fnaisc,
@@ -484,10 +486,10 @@
      &                fabsl,fabss,
      &                ictsfl,ictsfs,icalbl,icalbs,icsnol,icsnos,
      &                iczorl,iczors,icplrl,icplrs,icalfl,icalfs,
-     &                gausm,  deads,
+     &                gausm,
      &                monclm, monanl, monfcs, monmer, mondif, igrdbg,
      &                blnmsk, bltmsk, landice
-      data gausm/.true./,  deads/.false./, blnmsk/0.0/, bltmsk/90.0/
+      data gausm/.true./,blnmsk/0.0/, bltmsk/90.0/
      &,    igrdbg/-1/
      &,    monclm/.false./, monanl/.false./, monfcs/.false./
      &,    monmer/.false./,  mondif/.false./,  landice/.true./
@@ -814,7 +816,6 @@
           write(6,*) ' '
           write(6,*) ' lugb=',lugb,' len=',len, ' lsoil=',lsoil
           write(6,*) 'iy=',iy,' im=',im,' id=',id,' ih=',ih,' fh=',fh   &
-     &,            ' sig1t(1)=',sig1t(1)                                &
      &,            ' gausm=',gausm,' blnmsk=',blnmsk,' bltmsk=',bltmsk
           write(6,*) ' '
         endif
@@ -1488,7 +1489,6 @@
      &                abslmx,abslmn,absomx,absomn,absimx,absimn,
      &                absjmx,absjmn,abssmx,abssmn,epsabs,
      &                rla,rlo,len,kqcm,percrit,lgchek,me)
-      endif
       endif
       if (monfcs) then
        if (me == 0) then
@@ -4775,27 +4775,6 @@
           smcfld(i,k) = (wetfld(i)*1000./150.)*.37 + .1
         enddo
       enddo
-      return
-      end
-
-!>\ingroup mod_sfcsub
-      subroutine usesgt(sig1t,slianl,tg3anl,len,lsoil,tsfanl,stcanl,    &
-     &                  tsfimx)
-      use machine , only : kind_io8,kind_io4
-      implicit none
-      integer i,len,lsoil
-      real (kind=kind_io8) tsfimx
-      real (kind=kind_io8) sig1t(len), slianl(len), tg3anl(len)
-      real (kind=kind_io8) tsfanl(len), stcanl(len,lsoil)
-!  soil temperature
-      if(sig1t(1).gt.0.) then
-        do i=1,len
-          if(slianl(i).ne.0.) then
-            tsfanl(i) = sig1t(i)
-          endif
-        enddo
-      endif
-      call getstc(tsfanl,tg3anl,slianl,len,lsoil,stcanl,tsfimx)
       return
       end
 
