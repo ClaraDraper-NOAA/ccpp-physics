@@ -658,7 +658,7 @@
         read (nlunit,namsfc)
 #endif
         if (me == 0) then
-          print *,' ftsfl,falbl,faisl,fsnol,fzorl=',                    &
+          print *,' ftsfl,falbl,faiqsl,fsnol,fzorl=',                    &
      &              ftsfl,falbl,faisl,fsnol,fzorl
           print *,' fsmcl=',fsmcl(1:lsoil)
           print *,' fstcl=',fstcl(1:lsoil)
@@ -1370,169 +1370,125 @@
         write(6,*) '  fcst guess'
         write(6,*) '=============='
       endif
-        percrit = critp2
-      if(deads) then
-!  fill in guess array with analysis if dead start.
-        percrit=critp3
-        if (me == 0) write(6,*) 'this run is dead start run'
-        call filfcs(tsffcs,wetfcs,snofcs,zorfcs,albfcs,
-     &              tg3fcs,cvfcs ,cvbfcs,cvtfcs,
-     &              cnpfcs,smcfcs,stcfcs,slifcs,aisfcs,
-     &              vegfcs,vetfcs,sotfcs,socfcs,alffcs,  
-     &              sihfcs,sicfcs,
-     &              vmnfcs,vmxfcs,slpfcs,absfcs,
-     &              tsfanl,wetanl,snoanl,zoranl,albanl,
-     &              tg3anl,cvanl ,cvbanl,cvtanl,
-     &              cnpanl,smcanl,stcanl,slianl,aisanl,
-     &              veganl,vetanl,sotanl,socanl,alfanl, 
-     &              sihanl,sicanl,
-     &              vmnanl,vmxanl,slpanl,absanl,
-     &              len,lsoil)
-
-      do i=1,len
-        print *, 'AFTER FILFCS (i) is ',socfcs (i)
-      enddo
-
-        if (sig1t(1) /= 0.) then
-          call usesgt(sig1t,slianl,tg3anl,len,lsoil,tsffcs,stcfcs,
-     &                tsfimx)
-         do i=1,len
-            icefl2(i) = sicfcs(i) > 0.99999
-          enddo
-          kqcm = 1
-          call qcmxmn('tsff    ',tsffcs,slifcs,snofcs,icefl2,
-     &                tsflmx,tsflmn,tsfomx,tsfomn,tsfimx,tsfimn,
-     &                tsfjmx,tsfjmn,tsfsmx,tsfsmn,epstsf,
-     &                rla,rlo,len,kqcm,percrit,lgchek,me)
-          call qcmxmn('stc1f   ',stcfcs(1,1),slmskl,snofcs,icefl1,
-     &                stclmx,stclmn,stcomx,stcomn,stcimx,stcimn,
-     &                stcjmx,stcjmn,stcsmx,stcsmn,eptsfc,
-     &                rla,rlo,len,kqcm,percrit,lgchek,me)
-          call qcmxmn('stc2f   ',stcfcs(1,2),slmskl,snofcs,icefl1,
-     &                stclmx,stclmn,stcomx,stcomn,stcimx,stcimn,
-     &                stcjmx,stcjmn,stcsmx,stcsmn,eptsfc,
-     &                rla,rlo,len,kqcm,percrit,lgchek,me)
-        endif
-      else
-        percrit = critp2
+      percrit = critp2
 !  make reverse angulation correction to tsf
 !  make reverse orography correction to tg3
-        if (use_ufo) then
-          orogd = orog - orog_uf
+      if (use_ufo) then
+        orogd = orog - orog_uf
 ! The tiled version of the substrate temperature is properly
 ! adjusted to the terrain.  Only invoke when using the old
 ! global tg3 grib file.
-          if ( index(fntg3c, "tileX.nc") == 0) then ! global file
-            ztsfc = 1.0
-            call tsfcor(tg3fcs,orogd,slmskl,ztsfc,len,-rlapse)
-          endif
-          ztsfc = 0.
-          call tsfcor(tsffcs,orogd,slmskw,ztsfc,len,-rlapse)
-        else
-          ztsfc = 0.
-          call tsfcor(tsffcs,orog,slmskw,ztsfc,len,-rlapse)
+        if ( index(fntg3c, "tileX.nc") == 0) then ! global file
+          ztsfc = 1.0
+          call tsfcor(tg3fcs,orogd,slmskl,ztsfc,len,-rlapse)
         endif
+        ztsfc = 0.
+        call tsfcor(tsffcs,orogd,slmskw,ztsfc,len,-rlapse)
+      else
+        ztsfc = 0.
+        call tsfcor(tsffcs,orog,slmskw,ztsfc,len,-rlapse)
+      endif
 
 !  compute soil moisture liquid-to-total ratio over land
-        do j=1, lsoil
-          do i=1, len
-            if(smcfcs(i,j) /=  0.)  then
-              swratio(i,j) = slcfcs(i,j)/smcfcs(i,j)
-            else
-              swratio(i,j) = -999.
-            endif
-          enddo
+      do j=1, lsoil
+        do i=1, len
+          if(smcfcs(i,j) /=  0.)  then
+            swratio(i,j) = slcfcs(i,j)/smcfcs(i,j)
+          else
+            swratio(i,j) = -999.
+          endif
         enddo
-        if (lqcbgs .and. irtacn == 0) then
-          call qcsli(slianl,slifcs,len,me)
-          call albocn(albfcs,slmskl,albomx,len)
-         do i=1,len
-            icefl2(i) = sicfcs(i) .gt. 0.99999
-          enddo
-          kqcm = 1
-          call qcmxmn('snof    ',snofcs,slifcs,snofcs,icefl1,
+      enddo
+      if (lqcbgs .and. irtacn == 0) then
+        call qcsli(slianl,slifcs,len,me)
+        call albocn(albfcs,slmskl,albomx,len)
+       do i=1,len
+          icefl2(i) = sicfcs(i) .gt. 0.99999
+        enddo
+        kqcm = 1
+        call qcmxmn('snof    ',snofcs,slifcs,snofcs,icefl1,
      &                snolmx,snolmn,snoomx,snoomn,snoimx,snoimn,
      &                snojmx,snojmn,snosmx,snosmn,epssno,
      &                rla,rlo,len,kqcm,percrit,lgchek,me)
-          call qcmxmn('tsff    ',tsffcs,slifcs,snofcs,icefl2,
+        call qcmxmn('tsff    ',tsffcs,slifcs,snofcs,icefl2,
      &                tsflmx,tsflmn,tsfomx,tsfomn,tsfimx,tsfimn,
      &                tsfjmx,tsfjmn,tsfsmx,tsfsmn,epstsf,
      &                rla,rlo,len,kqcm,percrit,lgchek,me)
-          do kk = 1, 4
-          call qcmxmn('albf    ',albfcs(1,kk),slifcs,snofcs,icefl1,
+        do kk = 1, 4
+        call qcmxmn('albf    ',albfcs(1,kk),slifcs,snofcs,icefl1,
      &                alblmx,alblmn,albomx,albomn,albimx,albimn,
      &                albjmx,albjmn,albsmx,albsmn,epsalb,
      &                rla,rlo,len,kqcm,percrit,lgchek,me)
-          enddo
+        enddo
         if(fnwetc(1:8) /= '        ' .or. fnweta(1:8) /= '        ' )
-     &                                                          then
+                                                        then
           call qcmxmn('wetf    ',wetfcs,slifcs,snofcs,icefl1,
      &                wetlmx,wetlmn,wetomx,wetomn,wetimx,wetimn,
      &                wetjmx,wetjmn,wetsmx,wetsmn,epswet,
      &                rla,rlo,len,kqcm,percrit,lgchek,me)
         endif
-          call qcmxmn('zorf    ',zorfcs,slifcs,snofcs,icefl1,
+        call qcmxmn('zorf    ',zorfcs,slifcs,snofcs,icefl1,
      &                zorlmx,zorlmn,zoromx,zoromn,zorimx,zorimn,
      &                zorjmx,zorjmn,zorsmx,zorsmn,epszor,
      &                rla,rlo,len,kqcm,percrit,lgchek,me)
-          call qcmxmn('tg3f    ',tg3fcs,slmskl,snofcs,icefl1,
+        call qcmxmn('tg3f    ',tg3fcs,slmskl,snofcs,icefl1,
      &                tg3lmx,tg3lmn,tg3omx,tg3omn,tg3imx,tg3imn,
      &                tg3jmx,tg3jmn,tg3smx,tg3smn,epstg3,
      &                rla,rlo,len,kqcm,percrit,lgchek,me)
-          call qcmxmn('sihf    ',sihfcs,slifcs,snofcs,icefl1,
+        call qcmxmn('sihf    ',sihfcs,slifcs,snofcs,icefl1,
      &                sihlmx,sihlmn,sihomx,sihomn,sihimx,sihimn,
      &                sihjmx,sihjmn,sihsmx,sihsmn,epssih,
      &                rla,rlo,len,kqcm,percrit,lgchek,me)
 !-- soil moisture forecast
-        do k=1,lsoil
-          call qcmxmn(message('smcfcw',k),smcfcs(1,k),slmskl,
+      do k=1,lsoil
+        call qcmxmn(message('smcfcw',k),smcfcs(1,k),slmskl,
      &                snofcs,icefl1,
      &                smclmx,smclmn,smcomx,smcomn,smcimx,smcimn,
      &                smcjmx,smcjmn,smcsmx,smcsmn,epssmc,
      &                rla,rlo,len,kqcm,percrit,lgchek,me)
-        enddo
+      enddo
 !-- soil temperature forecast
-        do k=1,lsoil
-          call qcmxmn(message('stcf',k),stcfcs(1,k),slmskl,
+      do k=1,lsoil
+        call qcmxmn(message('stcf',k),stcfcs(1,k),slmskl,
      &                snofcs,icefl1,
      &                stclmx,stclmn,stcomx,stcomn,stcimx,stcimn,
      &                stcjmx,stcjmn,stcsmx,stcsmn,eptsfc,
      &                rla,rlo,len,kqcm,percrit,lgchek,me)
-        enddo
-          call qcmxmn('vegf    ',vegfcs,slmskl,snofcs,icefl1,
+      enddo
+        call qcmxmn('vegf    ',vegfcs,slmskl,snofcs,icefl1,
      &                veglmx,veglmn,vegomx,vegomn,vegimx,vegimn,
      &                vegjmx,vegjmn,vegsmx,vegsmn,epsveg,
      &                rla,rlo,len,kqcm,percrit,lgchek,me)
-          call qcmxmn('vetf    ',vetfcs,slmskl,snofcs,icefl1,
+        call qcmxmn('vetf    ',vetfcs,slmskl,snofcs,icefl1,
      &                vetlmx,vetlmn,vetomx,vetomn,vetimx,vetimn,
      &                vetjmx,vetjmn,vetsmx,vetsmn,epsvet,
      &                rla,rlo,len,kqcm,percrit,lgchek,me)
-          call qcmxmn('sotf    ',sotfcs,slmskl,snofcs,icefl1,
+        call qcmxmn('sotf    ',sotfcs,slmskl,snofcs,icefl1,
      &                sotlmx,sotlmn,sotomx,sotomn,sotimx,sotimn,
      &                sotjmx,sotjmn,sotsmx,sotsmn,epssot,
      &                rla,rlo,len,kqcm,percrit,lgchek,me)
-          call qcmxmn('socf    ',socfcs,slmskl,snofcs,icefl1,  
+        call qcmxmn('socf    ',socfcs,slmskl,snofcs,icefl1,  
      &                soclmx,soclmn,socomx,socomn,socimx,socimn,
      &                socjmx,socjmn,socsmx,socsmn,epssoc,
      &                rla,rlo,len,kqcm,percrit,lgchek,me)
 
-          call qcmxmn('vmnf    ',vmnfcs,slmskl,snofcs,icefl1,
+        call qcmxmn('vmnf    ',vmnfcs,slmskl,snofcs,icefl1,
      &                vmnlmx,vmnlmn,vmnomx,vmnomn,vmnimx,vmnimn,
      &                vmnjmx,vmnjmn,vmnsmx,vmnsmn,epsvmn,
      &                rla,rlo,len,kqcm,percrit,lgchek,me)
-          call qcmxmn('vmxf    ',vmxfcs,slmskl,snofcs,icefl1,
+        call qcmxmn('vmxf    ',vmxfcs,slmskl,snofcs,icefl1,
      &                vmxlmx,vmxlmn,vmxomx,vmxomn,vmximx,vmximn,
      &                vmxjmx,vmxjmn,vmxsmx,vmxsmn,epsvmx,
      &                rla,rlo,len,kqcm,percrit,lgchek,me)
-          call qcmxmn('slpf    ',slpfcs,slmskl,snofcs,icefl1,
+        call qcmxmn('slpf    ',slpfcs,slmskl,snofcs,icefl1,
      &                slplmx,slplmn,slpomx,slpomn,slpimx,slpimn,
      &                slpjmx,slpjmn,slpsmx,slpsmn,epsslp,
      &                rla,rlo,len,kqcm,percrit,lgchek,me)
-          call qcmxmn('absf    ',absfcs,slifcs,snofcs,icefl1,
+        call qcmxmn('absf    ',absfcs,slifcs,snofcs,icefl1,
      &                abslmx,abslmn,absomx,absomn,absimx,absimn,
      &                absjmx,absjmn,abssmx,abssmn,epsabs,
      &                rla,rlo,len,kqcm,percrit,lgchek,me)
-        endif
+      endif
       endif
       if (monfcs) then
        if (me == 0) then
