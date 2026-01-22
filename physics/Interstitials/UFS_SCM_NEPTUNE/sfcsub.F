@@ -3632,31 +3632,6 @@
       end
 
 !>\ingroup mod_sfcsub
-      subroutine bktges(smcfcs,stcfcs,len,lsoil)
-      use machine , only : kind_io8,kind_io4
-      implicit none
-      integer i,j,len,lsoil,k
-      real (kind=kind_io8) smcfcs(len,lsoil), stcfcs(len,lsoil)
-!  note that smfcs comes in with the original unit (cm?) (not grib file)
-      do i = 1, len
-        smcfcs(i,1) = (smcfcs(i,1)/150.) * .37 + .1
-      enddo
-      do k = 2, lsoil
-        do i = 1, len
-          smcfcs(i,k) = smcfcs(i,1)
-        enddo
-      enddo
-      if(lsoil.gt.2) then
-        do k = 3, lsoil
-          do i = 1, len
-            stcfcs(i,k) = stcfcs(i,2)
-          enddo
-        enddo
-      endif
-      return
-      end
-
-!>\ingroup mod_sfcsub
       subroutine rof01(aisfld, len, op, crit)
       use machine , only : kind_io8,kind_io4
       implicit none
@@ -5625,24 +5600,6 @@ cjfe
 
       end subroutine landtyp
 
-!>\ingroup mod_sfcsub
-      subroutine gaulat(gaul,k)
-      use machine , only : kind_io8,kind_io4,kind_dbl_prec
-      implicit none
-      integer n,k
-      real (kind=kind_io8) radi
-      real (kind=kind_io8) gaul(k)
-      real (kind=kind_dbl_prec) a(k), w(k)
-      call splat(4, k, a, w)
-      radi = 180.0 / (4.*atan(1.))
-      do  n=1,k
-        gaul(n) = acos(a(n)) * radi
-      enddo
-      return
-   70 write(6,6000)
- 6000 format(//5x,'error in gauaw'//)
-      stop
-      end
 !-----------------------------------------------------------------------
 !>\ingroup mod_sfcsub
 !! The subroutine conducts time interpolation of anomalies,
