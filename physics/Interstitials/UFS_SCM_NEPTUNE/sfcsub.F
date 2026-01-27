@@ -160,9 +160,8 @@
       integer imsk,jmsk,ifp,irtscv,irtacn,irtais,irtsno,irtzor,         &
      &        irtalb,irtsot,irtsoc,irtalf,j,irtvet,irtsmc,irtstc,irtveg,& 
      &        irtwet,k,iprnt,kk,irttsf,iret,i,igrdbg,iy,im,id,          &
-     &        icalbl,icalbs,icalfl,ictsfs,lugb,len,lsoil,ih,            &
-     &        ictsfl,iczors,icplrl,icplrs,iczorl,icalfs,icsnol,         &
-     &        icsnos,irttg3,kqcm,nlunit,sz_nml,ialb                     &
+     &        lugb,len,lsoil,ih,                                        &
+     &        irttg3,kqcm,nlunit,sz_nml,ialb                            &
      &,       irtvmn, irtvmx, irtslp, irtabs, isot, ivegsrc
       logical gausm, monclm, monanl,                                    &
      &        monfcs, monmer, mondif, landice
@@ -481,8 +480,6 @@
      &                fsihl,fsicl,fsihs,fsics,aislim,sihnew,
      &                fvmnl,fvmns,fvmxl,fvmxs,fslpl,fslps,
      &                fabsl,fabss,
-     &                ictsfl,ictsfs,icalbl,icalbs,icsnol,icsnos,
-     &                iczorl,iczors,icplrl,icplrs,icalfl,icalfs,
      &                gausm,
      &                monclm, monanl, monfcs, monmer, mondif, igrdbg,
      &                blnmsk, bltmsk, landice,
@@ -560,13 +557,6 @@
       data fvmxl/0.0/,      fvmxs/99999.0/
       data fslpl/0.0/,      fslps/99999.0/
       data fabsl/0.0/,      fabss/99999.0/
-!  default flag to apply climatological annual cycle
-      data ictsfl/0/, ictsfs/1/
-      data icalbl/1/, icalbs/1/
-      data icalfl/1/, icalfs/1/
-      data icsnol/0/, icsnos/0/
-      data iczorl/1/, iczors/0/
-      data icplrl/1/, icplrs/0/
       data ccnp/1.0/
       data ccv/1.0/,   ccvb/1.0/, ccvt/1.0/
       data ifp/0/
@@ -589,8 +579,6 @@
      &     fsihl,fsihs,fsicl,fsics,aislim,sihnew,
      &     fvmnl,fvmns,fvmxl,fvmxs,fslpl,fslps,
      &     fabsl,fabss,
-     &     ictsfl,ictsfs,icalbl,icalbs,icsnol,icsnos,
-     &     iczorl,iczors,icplrl,icplrs,icalfl,icalfs,
      &     gausm,
      &     monclm, monanl, monfcs, monmer, mondif, igrdbg,
      &     grboro, grbmsk,
