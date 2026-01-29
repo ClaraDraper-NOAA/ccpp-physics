@@ -122,7 +122,7 @@
      &                     epssmc,epsscv,eptsfc,                        &
      &                     epstg3,epsais,epsveg,epsvet,                 &
      &                     epssot,epssoc,epsalf,qctsfs,qcsnos,qctsfi,   &
-     &                     aislim,snwmin,snwmax,cplrl,cplrs,            &
+     &                     aislim,snwmin,snwmax,                        &
      &                     cvegl,czors,csnol,csnos,czorl,csots,         &
      &                     csotl,csocs,csocl,cvwgs,cvetl,cvets,calfs,   &
      &                     fcalfl,fcalfs,ccvt,ccnp,ccv,ccvb,            &
@@ -583,7 +583,7 @@
      &     monclm, monanl, monfcs, monmer, mondif, igrdbg,
      &     grboro, grbmsk,
      &     ctsfl,  ctsfs,  calbl, calfl, calbs, calfs, csmcs,
-     &     csnol,  csnos,  czorl, czors, cplrl, cplrs, cstcl,
+     &     csnol,  csnos,  czorl, czors, cstcl,
      &     cstcs,  cvegl,  cvwgs, cvetl, cvets, csotl, csots,
      &     csocl, csocs,                 
      &     csmcl
@@ -1022,43 +1022,6 @@
      &            abslmx,abslmn,absomx,absomn,absimx,absimn,
      &            absjmx,absjmn,abssmx,abssmn,epsabs,
      &            rla,rlo,len,kqcm,percrit,lgchek,me)
-!  monitoring prints
-      if (monclm) then
-       if (me == 0) then
-        print *,' '
-        print *,'monitor of time and space interpolated climatology'
-        print *,' '
-        call monitr('tsfclm',tsfclm,sliclm,snoclm,len)
-        call monitr('albclm',albclm(1,1),sliclm,snoclm,len)
-        call monitr('albclm',albclm(1,2),sliclm,snoclm,len)
-        call monitr('albclm',albclm(1,3),sliclm,snoclm,len)
-        call monitr('albclm',albclm(1,4),sliclm,snoclm,len)
-        call monitr('aisclm',aisclm,sliclm,snoclm,len)
-        call monitr('snoclm',snoclm,sliclm,snoclm,len)
-        call monitr('scvclm',scvclm,sliclm,snoclm,len)
-        do k=1,lsoil
-          call monitr(message('smcclm',k),smcclm(1,k),sliclm,snoclm,len)
-          call monitr(message('stcclm',k),stcclm(1,k),sliclm,snoclm,len)
-        enddo
-        call monitr('tg3clm',tg3clm,sliclm,snoclm,len)
-        call monitr('zorclm',zorclm,sliclm,snoclm,len)
-        call monitr('cvaclm',cvclm ,sliclm,snoclm,len)
-        call monitr('cvbclm',cvbclm,sliclm,snoclm,len)
-        call monitr('cvtclm',cvtclm,sliclm,snoclm,len)
-        call monitr('sliclm',sliclm,sliclm,snoclm,len)
-        call monitr('orog  ',orog  ,sliclm,snoclm,len)
-        call monitr('vegclm',vegclm,sliclm,snoclm,len)
-        call monitr('vetclm',vetclm,sliclm,snoclm,len)
-        call monitr('sotclm',sotclm,sliclm,snoclm,len)
-        call monitr('socclm',socclm,sliclm,snoclm,len) 
-        call monitr('sihclm',sihclm,sliclm,snoclm,len)
-        call monitr('sicclm',sicclm,sliclm,snoclm,len)
-        call monitr('vmnclm',vmnclm,sliclm,snoclm,len)
-        call monitr('vmxclm',vmxclm,sliclm,snoclm,len)
-        call monitr('slpclm',slpclm,sliclm,snoclm,len)
-        call monitr('absclm',absclm,sliclm,snoclm,len)
-       endif
-      endif
       if (me == 0) then
         write(6,*) '=============='
         write(6,*) '   analysis'
@@ -1317,41 +1280,7 @@
      &            abslmx,abslmn,absomx,absomn,absimx,absimn,
      &            absjmx,absjmn,abssmx,abssmn,epsabs,
      &            rla,rlo,len,kqcm,percrit,lgchek,me)
-!  monitoring prints
-      if (monanl) then
-       if (me == 0) then
-        print *,' '
-        print *,'monitor of time and space interpolated analysis'
-        print *,' '
-        call monitr('tsfanl',tsfanl,slianl,snoanl,len)
-        call monitr('albanl',albanl,slianl,snoanl,len)
-        call monitr('aisanl',aisanl,slianl,snoanl,len)
-        call monitr('snoanl',snoanl,slianl,snoanl,len)
-        call monitr('scvanl',scvanl,slianl,snoanl,len)
-        do k=1,lsoil
-          call monitr(message('smcanl',k),smcanl(1,k),slianl,snoanl,len)
-          call monitr(message('stcanl',k),stcanl(1,k),slianl,snoanl,len)
-        enddo
-        call monitr('tg3anl',tg3anl,slianl,snoanl,len)
-        call monitr('zoranl',zoranl,slianl,snoanl,len)
-        call monitr('cvaanl',cvanl ,slianl,snoanl,len)
-        call monitr('cvbanl',cvbanl,slianl,snoanl,len)
-        call monitr('cvtanl',cvtanl,slianl,snoanl,len)
-        call monitr('slianl',slianl,slianl,snoanl,len)
-        call monitr('orog  ',orog  ,slianl,snoanl,len)
-        call monitr('veganl',veganl,slianl,snoanl,len)
-        call monitr('vetanl',vetanl,slianl,snoanl,len)
-        call monitr('sotanl',sotanl,slianl,snoanl,len)
-        call monitr('socanl',socanl,slianl,snoanl,len)  
-        call monitr('sihanl',sihanl,slianl,snoanl,len)
-        call monitr('sicanl',sicanl,slianl,snoanl,len)
-        call monitr('vmnanl',vmnanl,slianl,snoanl,len)
-        call monitr('vmxanl',vmxanl,slianl,snoanl,len)
-        call monitr('slpanl',slpanl,slianl,snoanl,len)
-        call monitr('absanl',absanl,slianl,snoanl,len)
-       endif
 
-      endif
 !  read in forecast fields if needed
       if (me == 0) then
         write(6,*) '=============='
@@ -1477,38 +1406,7 @@
      &                absjmx,absjmn,abssmx,abssmn,epsabs,
      &                rla,rlo,len,kqcm,percrit,lgchek,me)
       endif
-      if (monfcs) then
-       if (me == 0) then
-        print *,' '
-        print *,'monitor of guess'
-        print *,' '
-        call monitr('tsffcs',tsffcs,slifcs,snofcs,len)
-        call monitr('albfcs',albfcs,slifcs,snofcs,len)
-        call monitr('aisfcs',aisfcs,slifcs,snofcs,len)
-        call monitr('snofcs',snofcs,slifcs,snofcs,len)
-        do k=1,lsoil
-          call monitr(message('smcfcs',k),smcfcs(1,k),slifcs,snofcs,len)
-          call monitr(message('stcfcs',k),stcfcs(1,k),slifcs,snofcs,len)
-        enddo
-        call monitr('tg3fcs',tg3fcs,slifcs,snofcs,len)
-        call monitr('zorfcs',zorfcs,slifcs,snofcs,len)
-        call monitr('cvafcs',cvfcs ,slifcs,snofcs,len)
-        call monitr('cvbfcs',cvbfcs,slifcs,snofcs,len)
-        call monitr('cvtfcs',cvtfcs,slifcs,snofcs,len)
-        call monitr('slifcs',slifcs,slifcs,snofcs,len)
-        call monitr('orog  ',orog  ,slifcs,snofcs,len)
-        call monitr('vegfcs',vegfcs,slifcs,snofcs,len)
-        call monitr('vetfcs',vetfcs,slifcs,snofcs,len)
-        call monitr('sotfcs',sotfcs,slifcs,snofcs,len)
-        call monitr('socfcs',socfcs,slifcs,snofcs,len)
-        call monitr('sihfcs',sihfcs,slifcs,snofcs,len)
-        call monitr('sicfcs',sicfcs,slifcs,snofcs,len)
-        call monitr('vmnfcs',vmnfcs,slifcs,snofcs,len)
-        call monitr('vmxfcs',vmxfcs,slifcs,snofcs,len)
-        call monitr('slpfcs',slpfcs,slifcs,snofcs,len)
-        call monitr('absfcs',absfcs,slifcs,snofcs,len)
-       endif
-      endif
+
 !...   update annual cycle in the sst guess..
       do i=1,len
         if (nint(slmskl(i)) /= 1) then
@@ -1677,124 +1575,7 @@
         call tsfcor(tsfanl,orog,slmskw,ztsfc,len,rlapse)
       endif
 !  check the final merged product
-      if (monmer) then
-       if(me == 0) then
-        print *,' '
-        print *,'monitor of updated surface fields'
-        print *,'   (includes angulation correction)'
-        print *,' '
-        call monitr('tsfanl',tsfanl,slianl,snoanl,len)
-        call monitr('albanl',albanl,slianl,snoanl,len)
-        call monitr('aisanl',aisanl,slianl,snoanl,len)
-        call monitr('snoanl',snoanl,slianl,snoanl,len)
-        do k=1,lsoil
-          call monitr(message('smcanl',k),smcanl(1,k),slianl,snoanl,len)
-          call monitr(message('stcanl',k),stcanl(1,k),slianl,snoanl,len)
-        enddo
-        if (lsoil > 2) then
-          call monitr('tg3anl',tg3anl,slianl,snoanl,len)
-          call monitr('zoranl',zoranl,slianl,snoanl,len)
-        endif
-        call monitr('cvaanl',cvanl ,slianl,snoanl,len)
-        call monitr('cvbanl',cvbanl,slianl,snoanl,len)
-        call monitr('cvtanl',cvtanl,slianl,snoanl,len)
-        call monitr('slianl',slianl,slianl,snoanl,len)
-        call monitr('orog  ',orog  ,slianl,snoanl,len)
-        call monitr('cnpanl',cnpanl,slianl,snoanl,len)
-        call monitr('veganl',veganl,slianl,snoanl,len)
-        call monitr('vetanl',vetanl,slianl,snoanl,len)
-        call monitr('sotanl',sotanl,slianl,snoanl,len)
-        call monitr('socanl',socanl,slianl,snoanl,len)
-        call monitr('sihanl',sihanl,slianl,snoanl,len)
-        call monitr('sicanl',sicanl,slianl,snoanl,len)
-        call monitr('vmnanl',vmnanl,slianl,snoanl,len)
-        call monitr('vmxanl',vmxanl,slianl,snoanl,len)
-        call monitr('slpanl',slpanl,slianl,snoanl,len)
-        call monitr('absanl',absanl,slianl,snoanl,len)
-       endif
-      endif
-      if (mondif) then
-        allocate (tsffcsd(len), snofcsd(len), tg3fcsd(len),             &
-     &            zorfcsd(len), slifcsd(len), aisfcsd(len),             &
-     &            cnpfcsd(len), vegfcsd(len), vetfcsd(len),             &
-     &            sotfcsd(len), socfcsd(len),sihfcsd(len),              &
-     &            sicfcsd(len),                                         &
-     &            vmnfcsd(len), vmxfcsd(len), slpfcsd(len),             &
-     &            absfcsd(len))
-         allocate (smcfcsd(len,lsoil), stcfcsd(len,lsoil),              &
-     &             albfcsd(len,4))
-        do i=1,len
-          tsffcsd(i) = tsfanl(i) - tsffcs(i)
-          snofcsd(i) = snoanl(i) - snofcs(i)
-          tg3fcsd(i) = tg3anl(i) - tg3fcs(i)
-          zorfcsd(i) = zoranl(i) - zorfcs(i)
-          slifcsd(i) = slianl(i) - slifcs(i)
-          aisfcsd(i) = aisanl(i) - aisfcs(i)
-          cnpfcsd(i) = cnpanl(i) - cnpfcs(i)
-          vegfcsd(i) = veganl(i) - vegfcs(i)
-          vetfcsd(i) = vetanl(i) - vetfcs(i)
-          sotfcsd(i) = sotanl(i) - sotfcs(i)
-          socfcsd(i) = socanl(i) - socfcs(i) 
-          sihfcsd(i) = sihanl(i) - sihfcs(i)
-          sicfcsd(i) = sicanl(i) - sicfcs(i)
-          vmnfcsd(i) = vmnanl(i) - vmnfcs(i)
-          vmxfcsd(i) = vmxanl(i) - vmxfcs(i)
-          slpfcsd(i) = slpanl(i) - slpfcs(i)
-          absfcsd(i) = absanl(i) - absfcs(i)
-        enddo
-        do j = 1,lsoil
-          do i = 1,len
-            smcfcsd(i,j) = smcanl(i,j) - smcfcs(i,j)
-            stcfcsd(i,j) = stcanl(i,j) - stcfcs(i,j)
-          enddo
-        enddo
-        do j = 1,4
-          do i = 1,len
-            albfcsd(i,j) = albanl(i,j) - albfcs(i,j)
-          enddo
-        enddo
-!  monitoring prints
-       if(me == 0) then
-        print *,' '
-        print *,'monitor of difference'
-        print *,'   (includes angulation correction)'
-        print *,' '
-        call monitr('tsfdif', tsffcsd,slianl,snoanl,len)
-        call monitr('albdif', albfcsd,slianl,snoanl,len)
-        call monitr('albdif1',albfcsd,slianl,snoanl,len)
-        call monitr('albdif2',albfcsd(1,2),slianl,snoanl,len)
-        call monitr('albdif3',albfcsd(1,3),slianl,snoanl,len)
-        call monitr('albdif4',albfcsd(1,4),slianl,snoanl,len)
-        call monitr('aisdif', aisfcsd,slianl,snoanl,len)
-        call monitr('snodif', snofcsd,slianl,snoanl,len)
-        do k=1,lsoil
-         call monitr(message('smcanl',k),smcfcsd(1,k),slianl,snoanl,len)
-         call monitr(message('stcanl',k),stcfcsd(1,k),slianl,snoanl,len)
-        enddo
-        call monitr('tg3dif',tg3fcsd,slianl,snoanl,len)
-        call monitr('zordif',zorfcsd,slianl,snoanl,len)
-        call monitr('cvadif',cvfcs ,slianl,snoanl,len)
-        call monitr('cvbdif',cvbfcs,slianl,snoanl,len)
-        call monitr('cvtdif',cvtfcs,slianl,snoanl,len)
-        call monitr('slidif',slifcsd,slianl,snoanl,len)
-        call monitr('cnpdif',cnpfcsd,slianl,snoanl,len)
-        call monitr('vegdif',vegfcsd,slianl,snoanl,len)
-        call monitr('vetdif',vetfcsd,slianl,snoanl,len)
-        call monitr('sotdif',sotfcsd,slianl,snoanl,len)
-        call monitr('socdif',socfcsd,slianl,snoanl,len) 
-        call monitr('sihdif',sihfcsd,slianl,snoanl,len)
-        call monitr('sicdif',sicfcsd,slianl,snoanl,len)
-        call monitr('vmndif',vmnfcsd,slianl,snoanl,len)
-        call monitr('vmxdif',vmxfcsd,slianl,snoanl,len)
-        call monitr('slpdif',slpfcsd,slianl,snoanl,len)
-        call monitr('absdif',absfcsd,slianl,snoanl,len)
-       endif
-       deallocate (tsffcsd, snofcsd, tg3fcsd, zorfcsd, slifcsd,         &
-     &             aisfcsd, cnpfcsd, vegfcsd, vetfcsd, sotfcsd,socfcsd, &
-     &             sihfcsd, sicfcsd, vmnfcsd, vmxfcsd, slpfcsd,         &
-     &             absfcsd)
-        deallocate (smcfcsd, stcfcsd, albfcsd)
-      endif
+
       do i=1,len
         tsffcs(i) = tsfanl(i)
         snofcs(i) = snoanl(i)
@@ -1951,59 +1732,6 @@
        enddo
       return
       end subroutine sfccycle 
-
-!>\ingroup mod_sfcsub
-      subroutine monitr(lfld,fld,slimsk,sno,ijmax)
-      use machine , only : kind_io8,kind_io4
-      implicit none
-      integer ij,n,ijmax
-      real (kind=kind_io8) fld(ijmax), slimsk(ijmax),sno(ijmax)
-      real (kind=kind_io8) rmax(5),rmin(5)
-      character(len=*) lfld
-!  find max/min
-      do n=1,5
-        rmax(n) = -9.e20
-        rmin(n) =  9.e20
-      enddo
-      do ij=1,ijmax
-         if(slimsk(ij).eq.0.) then
-            rmax(1) = max(rmax(1), fld(ij))
-            rmin(1) = min(rmin(1), fld(ij))
-         elseif(slimsk(ij).eq.1.) then
-            if(sno(ij).le.0.) then
-               rmax(2) = max(rmax(2), fld(ij))
-               rmin(2) = min(rmin(2), fld(ij))
-            else
-               rmax(4) = max(rmax(4), fld(ij))
-               rmin(4) = min(rmin(4), fld(ij))
-            endif
-         else
-            if(sno(ij).le.0.) then
-               rmax(3) = max(rmax(3), fld(ij))
-               rmin(3) = min(rmin(3), fld(ij))
-            else
-               rmax(5) = max(rmax(5), fld(ij))
-               rmin(5) = min(rmin(5), fld(ij))
-            endif
-         endif
-      enddo
-      print 100,lfld
-      print 101,rmax(1),rmin(1)
-      print 102,rmax(2),rmin(2), rmax(4), rmin(4)
-      print 103,rmax(3),rmin(3), rmax(5), rmin(5)
-  100 format('0  *** ',a8,' ***')
-  101 format(' open sea  ......... max=',e12.4,' min=',e12.4)
-  102 format(' land nosnow/snow .. max=',e12.4,' min=',e12.4
-     &,                          ' max=',e12.4,' min=',e12.4)
-  103 format(' seaice nosnow/snow  max=',e12.4,' min=',e12.4
-     &,                          ' max=',e12.4,' min=',e12.4)
-! 100 format('0',2x,'*** ',a8,' ***')
-! 102 format(2x,' land without snow ..... max=',e12.4,' min=',e12.4)
-! 103 format(2x,' seaice without snow ... max=',e12.4,' min=',e12.4)
-! 104 format(2x,' land with snow ........ max=',e12.4,' min=',e12.4)
-! 105 format(2x,' sea ice with snow ..... max=',e12.4,' min=',e12.4)
-      return
-      end
 
 !>\ingroup mod_sfcsub
 !! reads a high resolution mask field for use in grib interpolation
