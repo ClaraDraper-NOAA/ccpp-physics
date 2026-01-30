@@ -3672,6 +3672,594 @@ cjfe
       end subroutine landtyp
 
 !>\ingroup mod_sfcsub
+      subroutine setzro(fld,eps,len)
+      use machine , only : kind_io8,kind_io4
+      implicit none
+      integer i,len
+      real (kind=kind_io8) fld(len),eps
+      do i=1,len
+        if(abs(fld(i)).lt.eps) fld(i) = 0.
+      enddo
+      return
+      end
+
+!>\ingroup mod_sfcsub
+      subroutine getscv(snofld,scvfld,len)
+      use machine , only : kind_io8,kind_io4
+      implicit none
+      integer i,len
+      real (kind=kind_io8) snofld(len),scvfld(len)
+      do i=1,len
+        scvfld(i) = 0.
+        if(snofld(i).gt.0.) scvfld(i) = 1.
+      enddo
+      return
+      end
+
+!>\ingroup mod_sfcsub
+      subroutine getstc(tsffld,tg3fld,slifld,len,lsoil,stcfld,tsfimx)
+      use machine , only : kind_io8,kind_io4
+      implicit none
+      integer k,i,len,lsoil
+      real (kind=kind_io8) factor,tsfimx
+      real (kind=kind_io8) tsffld(len), tg3fld(len), slifld(len)
+      real (kind=kind_io8) stcfld(len,lsoil)
+!  layer soil temperature
+      do k = 1, lsoil
+        do i = 1, len
+          if(slifld(i).eq.1.0) then
+            factor = ((k-1) * 2 + 1) / (2. * lsoil)
+            stcfld(i,k) = factor*tg3fld(i)+(1.-factor)*tsffld(i)
+          elseif(slifld(i).eq.2.0) then
+            factor = ((k-1) * 2 + 1) / (2. * lsoil)
+            stcfld(i,k) = factor*tsfimx+(1.-factor)*tsffld(i)
+          else
+            stcfld(i,k) = tg3fld(i)
+          endif
+        enddo
+      enddo
+      if(lsoil.gt.2) then
+        do k = 3, lsoil
+          do i = 1, len
+            stcfld(i,k) = stcfld(i,2)
+          enddo
+        enddo
+      endif
+      return
+      end
+
+!>\ingroup mod_sfcsub
+!! This subroutine calculates layer soil wetness.
+      subroutine getsmc(wetfld,len,lsoil,smcfld,me)
+      use machine , only : kind_io8,kind_io4
+      implicit none
+      integer k,i,len,lsoil,me
+      real (kind=kind_io8) wetfld(len), smcfld(len,lsoil)
+      if (me .eq. 0) write(6,*) 'getsmc'
+!  layer soil wetness
+      do k = 1, lsoil
+        do i = 1, len
+          smcfld(i,k) = (wetfld(i)*1000./150.)*.37 + .1
+        enddo
+      enddo
+      return
+      end
+
+!>\ingroup mod_sfcsub
+      subroutine snosfc(snoanl,tsfanl,tsfsmx,len,me)
+      use machine , only : kind_io8,kind_io4
+      implicit none
+      integer kount,i,len,me
+      real (kind=kind_io8) per,tsfsmx
+      real (kind=kind_io8) snoanl(len), tsfanl(len)
+      if (me .eq. 0) write(6,*) 'set snow temp to tsfsmx if greater'
+      kount=0
+      do i=1,len
+        if(snoanl(i).gt.0.) then
+          if(tsfanl(i).gt.tsfsmx) tsfanl(i)=tsfsmx
+          kount = kount + 1
+        endif
+      enddo
+      if(kount.gt.0) then
+        if(me .eq. 0) then
+        per=float(kount)/float(len)*100.
+        write(6,*) 'snow sfc.  tsf set to ',tsfsmx,' at ',
+     &              kount, ' points ',per,'percent'
+        endif
+      endif
+      return
+      end
+
+!>\ingroup mod_sfcsub
+      subroutine albocn(albclm,slmask,albomx,len)
+      use machine , only : kind_io8,kind_io4
+      implicit none
+      integer i,len
+      real (kind=kind_io8) albomx
+      real (kind=kind_io8) albclm(len,4), slmask(len)
+      do i=1,len
+        if(slmask(i) == 0) then
+          albclm(i,1) = albomx
+          albclm(i,2) = albomx
+          albclm(i,3) = albomx
+          albclm(i,4) = albomx
+        endif
+      enddo
+      return
+      end
+
+!>\ingroup mod_sfcsub
+      subroutine qcmxice(glacir,amxice,len,me)
+      use machine , only : kind_io8,kind_io4
+      implicit none
+      integer i,kount,len,me
+      real (kind=kind_io8) glacir(len),amxice(len),per
+      if (me .eq. 0) write(6,*) 'qc of maximum ice extent'
+      kount=0
+      do i=1,len
+        if(glacir(i).eq.1..and.amxice(i).eq.0.) then
+          amxice(i) = 0.
+          kount     = kount + 1
+        endif
+      enddo
+      if(kount.gt.0) then
+        per = float(kount) / float(len)*100.
+        if(me .eq. 0) write(6,*) ' max ice limit less than glacier'
+     &,            ' coverage at ', kount, ' points ',per,'percent'
+      endif
+      return
+      end
+
+!>\ingroup mod_sfcsub
+      subroutine qcsli(slianl,slifcs,len,me)
+      use machine , only : kind_io8,kind_io4
+      implicit none
+      integer i,kount,len,me
+      real (kind=kind_io8) slianl(len), slifcs(len),per
+      if (me .eq. 0) then
+      write(6,*) ' '
+      write(6,*) 'qcsli'
+      endif
+      kount=0
+      do i=1,len
+        if(slianl(i).eq.1..and.slifcs(i).eq.0.) then
+          kount      = kount + 1
+          slifcs(i) = 1.
+        endif
+        if(slianl(i).eq.0..and.slifcs(i).eq.1.) then
+          kount      = kount + 1
+          slifcs(i) = 0.
+        endif
+        if(slianl(i).eq.2..and.slifcs(i).eq.1.) then
+          kount      = kount + 1
+          slifcs(i) = 0.
+        endif
+        if(slianl(i).eq.1..and.slifcs(i).eq.2.) then
+          kount      = kount + 1
+          slifcs(i) = 1.
+        endif
+      enddo
+      if(kount.gt.0) then
+        per=float(kount)/float(len)*100.
+        if(me .eq. 0) then
+        write(6,*) ' inconsistency of slmask between forecast and',
+     &             ' analysis corrected at ',kount, ' points ',per,
+     &             'percent'
+        endif
+      endif
+      return
+      end
+
+!>\ingroup mod_sfcsub
+      subroutine qcbyfc(tsffcs,snofcs,qctsfs,qcsnos,qctsfi,             &
+     &                  len,lsoil,snoanl,aisanl,slianl,tsfanl,albanl,   &
+     &                  zoranl,smcanl,smcclm,tsfsmx,albomx,zoromx, me)
+      use machine , only : kind_io8,kind_io4
+      implicit none
+      integer kount,me,k,i,lsoil,len
+      real (kind=kind_io8) zoromx,per,albomx,qctsfi,qcsnos,qctsfs,tsfsmx
+      real (kind=kind_io8) tsffcs(len), snofcs(len)
+      real (kind=kind_io8) snoanl(len), aisanl(len),                    &
+     &                     slianl(len), zoranl(len),                    &
+     &                     tsfanl(len), albanl(len,4),                  &
+     &                     smcanl(len,lsoil), smcclm(len,lsoil)
+      if (me == 0) write(6,*) 'qc of snow and sea-ice analysis'
+! qc of snow analysis
+!  questionable snow cover
+      kount = 0
+      do i=1,len
+        if(slianl(i).gt.0..and.                                         &
+     &     tsffcs(i).gt.qctsfs.and.snoanl(i).gt.0.) then
+          kount      = kount + 1
+          snoanl(i) = 0.
+          tsfanl(i) = tsffcs(i)
+        endif
+      enddo
+      if(kount.gt.0) then
+        per=float(kount)/float(len)*100.
+        if (me .eq. 0) then
+        write(6,*) ' guess surface temp .gt. ',qctsfs,
+     &             ' but snow analysis indicates snow cover'
+        write(6,*) ' snow analysis set to zero',
+     &             ' at ',kount, ' points ',per,'percent'
+        endif
+      endif
+!  questionable no snow cover
+      kount = 0
+      do i=1,len
+        if(slianl(i).gt.0..and.
+     &     snofcs(i).gt.qcsnos.and.snoanl(i).lt.0.) then
+          kount      = kount + 1
+          snoanl(i) = snofcs(i)
+          tsfanl(i) = tsffcs(i)
+        endif
+      enddo
+      if(kount.gt.0) then
+        per=float(kount)/float(len)*100.
+        if (me .eq. 0) then
+        write(6,*) ' guess snow depth .gt. ',qcsnos,
+     &             ' but snow analysis indicates no snow cover'
+        write(6,*) ' snow analysis set to guess value',
+     &             ' at ',kount, ' points ',per,'percent'
+        endif
+      endif
+      return
+      end
+
+!>\ingroup mod_sfcsub
+      subroutine setrmsk(kpds5,slmask,igaul,jgaul,wlon,rnlat,           &
+     &                   data,imax,jmax,rlnout,rltout,lmask,rslmsk      &
+     &,                  gaus,blno, blto, kgds1, kpds4, lbms)
+      use machine , only : kind_io8,kind_io4,kind_dbl_prec
+      implicit none
+      real (kind=kind_io8) blno,blto,wlon,rnlat,crit,data_max
+      integer i,j,ijmax,jgaul,igaul,kpds5,jmax,imax, kgds1, kspla
+      integer, intent(in)   :: kpds4
+      logical*1, intent(in) :: lbms(imax,jmax)
+      real*4                :: dummy(imax,jmax)
+
+      real (kind=kind_io8)    slmask(igaul,jgaul)
+      real (kind=kind_io8)    data(imax,jmax),rslmsk(imax,jmax)
+     &,                       rlnout(imax), rltout(jmax)
+      real (kind=kind_io8)    radi, dlat, dlon
+      real (kind=kind_dbl_prec) a(jmax), w(jmax)
+      logical lmask, gaus
+!     set the longitude and latitudes for the grib file
+      if (kgds1 .eq. 4) then         ! grib file on gaussian grid
+        kspla=4
+        call splat(kspla, jmax, a, w)
+        radi = 180.0 / (4.*atan(1.))
+        do  j=1,jmax
+          rltout(j) = acos(a(j)) * radi
+        enddo
+        if (rnlat .gt. 0.0) then
+          do j=1,jmax
+            rltout(j) = 90. - rltout(j)
+          enddo
+        else
+          do j=1,jmax
+            rltout(j) = -90. + rltout(j)
+          enddo
+        endif
+      elseif (kgds1 .eq. 0) then     ! grib file on lat/lon grid
+        dlat = -(rnlat+rnlat) / float(jmax-1)
+        do j=1,jmax
+         rltout(j) = rnlat + (j-1) * dlat
+        enddo
+      else                           ! grib file on some other grid
+        write(6,*) ' FATAL ERROR: Mask data on'
+        write(6,*) ' unsupported grid.'
+        call abort
+      endif
+      dlon = 360.0 / imax
+      do i=1,imax
+        rlnout(i) = wlon + (i-1)*dlon
+      enddo
+      ijmax  = imax*jmax
+      rslmsk = 0.
+      if(kpds5 == kpdtsf .and. imax == 138 .and. jmax == 116
+     &   .and. kpds4 == 128) then
+         lmask = .false.
+
+      elseif(kpds5 == kpdtsf) then
+!  surface temperature
+        lmask = .false.
+        call ga2la(slmask,igaul,jgaul,rslmsk,imax,jmax,wlon,rnlat
+     &,            rlnout, rltout, gaus, blno, blto)
+        crit = 0.5
+        call rof01(rslmsk,ijmax,'ge',crit)
+        lmask = .true.
+!  bucket soil wetness
+      elseif(kpds5.eq.kpdwet) then
+        call ga2la(slmask,igaul,jgaul,rslmsk,imax,jmax,wlon,rnlat
+     &,            rlnout, rltout, gaus, blno, blto)
+        crit = 0.5
+        call rof01(rslmsk,ijmax,'ge',crit)
+        lmask = .true.
+!  snow depth
+      elseif(kpds5 == kpdsnd) then
+        if(kpds4 == 192) then  ! use the bitmap
+          rslmsk = 0.
+          do j = 1, jmax
+            do i = 1, imax
+              if (lbms(i,j)) then
+                rslmsk(i,j) = 1.
+              end if
+            enddo
+          enddo
+          lmask=.true.
+        else
+          lmask=.false.
+        end if
+! snow liq equivalent depth
+      elseif(kpds5.eq.kpdsno) then
+        call ga2la(slmask,igaul,jgaul,rslmsk,imax,jmax,wlon,rnlat
+     &,            rlnout, rltout, gaus, blno, blto)
+        crit=0.5
+        call rof01(rslmsk,ijmax,'ge',crit)
+        lmask=.true.
+!  soil moisture
+      elseif(kpds5.eq.kpdsmc) then
+        if(kpds4 == 192) then  ! use the bitmap
+          rslmsk = 0.
+          do j = 1, jmax
+            do i = 1, imax
+              if (lbms(i,j)) then
+                rslmsk(i,j) = 1.
+              end if
+            enddo
+          enddo
+          lmask=.true.
+        else
+          call ga2la(slmask,igaul,jgaul,rslmsk,imax,jmax,wlon,rnlat
+     &,            rlnout, rltout, gaus, blno, blto)
+          crit=0.5
+          call rof01(rslmsk,ijmax,'ge',crit)
+          lmask=.true.
+        endif
+!  surface roughness
+      elseif(kpds5.eq.kpdzor) then
+        do j=1,jmax
+          do i=1,imax
+            rslmsk(i,j)=data(i,j)
+          enddo
+        enddo
+        crit=9.9
+        call rof01(rslmsk,ijmax,'lt',crit)
+        lmask=.true.
+!  albedo
+!  new snowfree albedo database has bitmap, use it.
+      elseif(kpds5.eq.kpdalb(1)) then
+        if (kpds4 == 192) then  ! use the bitmap
+          rslmsk = 0.
+          do j = 1, jmax
+            do i = 1, imax
+              if (lbms(i,j)) then
+                rslmsk(i,j) = 1.
+              end if
+            enddo
+          enddo
+          lmask = .true.
+        else  ! no bitmap. old database has no water flag.
+          lmask=.false.
+        end if
+      elseif(kpds5.eq.kpdalb(2)) then
+!cbosu
+        if (kpds4 == 192) then  ! use the bitmap
+          rslmsk = 0.
+          do j = 1, jmax
+            do i = 1, imax
+              if (lbms(i,j)) then
+                rslmsk(i,j) = 1.
+              end if
+            enddo
+          enddo
+          lmask = .true.
+        else  ! no bitmap. old database has no water flag.
+          lmask=.false.
+        end if
+      elseif(kpds5.eq.kpdalb(3)) then
+!cbosu
+        if (kpds4 == 192) then  ! use the bitmap
+          rslmsk = 0.
+          do j = 1, jmax
+            do i = 1, imax
+              if (lbms(i,j)) then
+                rslmsk(i,j) = 1.
+              end if
+            enddo
+          enddo
+          lmask = .true.
+        else  ! no bitmap. old database has no water flag.
+          lmask=.false.
+        end if
+      elseif(kpds5.eq.kpdalb(4)) then
+!cbosu
+        if (kpds4 == 192) then  ! use the bitmap
+          rslmsk = 0.
+          do j = 1, jmax
+            do i = 1, imax
+              if (lbms(i,j)) then
+                rslmsk(i,j) = 1.
+              end if
+            enddo
+          enddo
+          lmask = .true.
+        else  ! no bitmap. old database has no water flag.
+          lmask=.false.
+        end if
+!  vegetation fraction for albedo
+      elseif(kpds5.eq.kpdalf(1)) then
+        lmask=.false.
+      elseif(kpds5.eq.kpdalf(2)) then
+        lmask=.false.
+!  sea ice
+      elseif(kpds5.eq.kpdais) then
+        lmask=.false.
+        data_max = 0.0
+        do j=1,jmax
+          do i=1,imax
+              rslmsk(i,j) = data(i,j)
+              data_max= max(data_max,data(i,j))
+          enddo
+        enddo
+        crit=1.0
+        if (data_max .gt. crit) then
+          call rof01(rslmsk,ijmax,'gt',crit)
+          lmask=.true.
+        else
+          lmask=.false.
+        endif
+!  deep soil temperature
+      elseif(kpds5.eq.kpdtg3) then
+        lmask=.false.
+!  glacier points
+      elseif(kpds5.eq.kpdgla) then
+        lmask=.false.
+!  max ice extent
+      elseif(kpds5.eq.kpdmxi) then
+        lmask=.false.
+!  snow cover
+      elseif(kpds5.eq.kpdscv) then
+        call ga2la(slmask,igaul,jgaul,rslmsk,imax,jmax,wlon,rnlat
+     &,            rlnout, rltout, gaus, blno, blto)
+        crit=0.5
+        call rof01(rslmsk,ijmax,'ge',crit)
+        lmask=.true.
+!  sea ice concentration
+      elseif(kpds5.eq.kpdacn) then
+        lmask=.false.
+        call ga2la(slmask,igaul,jgaul,rslmsk,imax,jmax,wlon,rnlat
+     &,            rlnout, rltout, gaus, blno, blto)
+        crit=0.5
+        call rof01(rslmsk,ijmax,'ge',crit)
+        lmask=.true.
+!  vegetation cover
+      elseif(kpds5.eq.kpdveg) then
+!cggg
+        if (kpds4 == 192) then  ! use the bitmap
+          rslmsk = 0.
+          do j = 1, jmax
+            do i = 1, imax
+              if (lbms(i,j)) then
+                rslmsk(i,jmax-j+1) = 1.  ! need to flip grid in n/s direction
+              end if
+            enddo
+          enddo
+          lmask = .true.
+        else  ! no bitmap, set mask the old way.
+
+          call ga2la(slmask,igaul,jgaul,rslmsk,imax,jmax,wlon,rnlat
+     &,              rlnout, rltout, gaus, blno, blto)
+          crit=0.5
+          call rof01(rslmsk,ijmax,'ge',crit)
+          lmask=.true.
+
+       end if
+!  soil type
+      elseif(kpds5.eq.kpdsot) then
+
+        if (kpds4 == 192) then  ! use the bitmap
+          rslmsk = 0.
+          do j = 1, jmax
+            do i = 1, imax
+              if (lbms(i,j)) then
+                rslmsk(i,j) = 1.
+              end if
+            enddo
+          enddo
+!  soil type is zero over water, use this to get a bitmap.
+        else
+          do j = 1, jmax
+          do i = 1, imax
+            rslmsk(i,j) = data(i,j)
+          enddo
+          enddo
+          crit=0.1
+          call rof01(rslmsk,ijmax,'gt',crit)
+        endif
+        lmask=.true.
+!  vegetation type
+      elseif(kpds5.eq.kpdvet) then
+
+        if (kpds4 == 192) then  ! use the bitmap
+          rslmsk = 0.
+          do j = 1, jmax
+            do i = 1, imax
+              if (lbms(i,j)) then
+                rslmsk(i,j) = 1.
+              end if
+            enddo
+          enddo
+!  veg type is zero over water, use this to get a bitmap.
+        else
+          do j = 1, jmax
+            do i = 1, imax
+              rslmsk(i,j) = data(i,j)
+            enddo
+          enddo
+          crit=0.1
+          call rof01(rslmsk,ijmax,'gt',crit)
+        endif
+        lmask=.true.
+!      these are for four new data type added by clu -- not sure its correct!
+      elseif(kpds5.eq.kpdvmn) then
+!  greenness is zero over water, use this to get a bitmap.
+        do j = 1, jmax
+          do i = 1, imax
+            rslmsk(i,j) = data(i,j)
+          enddo
+        enddo
+        crit=0.1
+        call rof01(rslmsk,ijmax,'gt',crit)
+        lmask=.true.
+      elseif(kpds5.eq.kpdvmx) then
+!  greenness is zero over water, use this to get a bitmap.
+        do j = 1, jmax
+          do i = 1, imax
+            rslmsk(i,j) = data(i,j)
+          enddo
+        enddo
+        crit=0.1
+        call rof01(rslmsk,ijmax,'gt',crit)
+        lmask=.true.
+      elseif(kpds5.eq.kpdslp) then
+!  slope type is zero over water, use this to get a bitmap.
+        do j = 1, jmax
+          do i = 1, imax
+            rslmsk(i,j) = data(i,j)
+          enddo
+        enddo
+        crit=0.1
+        call rof01(rslmsk,ijmax,'gt',crit)
+        lmask=.true.
+!  new maximum snow albedo database has bitmap
+      elseif(kpds5.eq.kpdabs) then
+        if (kpds4 == 192) then  ! use the bitmap
+          rslmsk = 0.
+          do j = 1, jmax
+            do i = 1, imax
+              if (lbms(i,j)) then
+                rslmsk(i,j) = 1.
+              end if
+            enddo
+          enddo
+          lmask = .true.
+        else  ! no bitmap. old database has zero over water
+          do j = 1, jmax
+            do i = 1, imax
+              rslmsk(i,j) = data(i,j)
+            enddo
+          enddo
+          crit=0.1
+          call rof01(rslmsk,ijmax,'gt',crit)
+          lmask=.true.
+        end if
+      endif
+      return
+      end
+
+!>\ingroup mod_sfcsub
       subroutine clima(lugb,iy,im,id,ih,fh,len,lsoil,slmskl,slmskw,     &
      &                 fntsfc,fnwetc,fnsnoc,fnzorc,fnalbc,fnaisc,       &
      &                 fntg3c,fnscvc,fnsmcc,fnstcc,fnacnc,fnvegc,       &
