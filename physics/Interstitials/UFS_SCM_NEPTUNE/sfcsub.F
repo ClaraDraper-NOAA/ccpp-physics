@@ -86,38 +86,9 @@
       real (kind=kind_io8), intent(in) :: min_ice(len)
 
       real (kind=kind_io8) sllnd,slsea,aicice,aicsea,tgice,rlapse,      &
-     &                     orolmx,orolmn,oroomx,oroomn,orosmx,          &
-     &                     orosmn,oroimx,oroimn,orojmx,orojmn,          &
-     &                     alblmx,alblmn,albomx,albomn,albsmx,          &
-     &                     albsmn,albimx,albimn,albjmx,albjmn,          &
-     &                     wetlmx,wetlmn,wetomx,wetomn,wetsmx,          &
-     &                     wetsmn,wetimx,wetimn,wetjmx,wetjmn,          &
-     &                     snolmx,snolmn,snoomx,snoomn,snosmx,          &
-     &                     snosmn,snoimx,snoimn,snojmx,snojmn,          &
-     &                     zorlmx,zorlmn,zoromx,zoromn,zorsmx,          &
-     &                     zorsmn,zorimx,zorimn,zorjmx,zorjmn,          &
-     &                     plrlmx,plrlmn,plromx,plromn,plrsmx,          &
-     &                     plrsmn,plrimx,plrimn,plrjmx,plrjmn,          &
-     &                     tsflmx,tsflmn,tsfomx,tsfomn,tsfsmx,          &
-     &                     tsfsmn,tsfimx,tsfimn,tsfjmx,tsfjmn,          &
-     &                     tg3lmx,tg3lmn,tg3omx,tg3omn,tg3smx,          &
-     &                     tg3smn,tg3imx,tg3imn,tg3jmx,tg3jmn,          &
-     &                     stclmx,stclmn,stcomx,stcomn,stcsmx,          &
-     &                     stcsmn,stcimx,stcimn,stcjmx,stcjmn,          &
-     &                     smclmx,smclmn,smcomx,smcomn,smcsmx,          &
-     &                     smcsmn,smcimx,smcimn,smcjmx,smcjmn,          &
-     &                     scvlmx,scvlmn,scvomx,scvomn,scvsmx,          &
-     &                     scvsmn,scvimx,scvimn,scvjmx,scvjmn,          &
-     &                     veglmx,veglmn,vegomx,vegomn,vegsmx,          &
-     &                     vegsmn,vegimx,vegimn,vegjmx,vegjmn,          &
-     &                     vetlmx,vetlmn,vetomx,vetomn,vetsmx,          &
-     &                     vetsmn,vetimx,vetimn,vetjmx,vetjmn,          &
-     &                     sotlmx,sotlmn,sotomx,sotomn,sotsmx,          &
-     &                     sotsmn,sotimx,sotimn,sotjmx,sotjmn,          &
-     &                     soclmx,soclmn,socomx,socomn,socsmx,          &
-     &                     socsmn,socimx,socimn,socjmx,socjmn,          &
-     &                     alslmx,alslmn,alsomx,alsomn,alssmx,          &
-     &                     alssmn,alsimx,alsimn,alsjmx,alsjmn,          &
+     &                     alblmx,alblmn,albomx,albsmx,albsmn,albimn,   &
+     &                     snoomx,snosmx,zoromx,zorimx,                 &
+     &                     tsfomn,tsfsmx,tsfimx,smcomx,smcimx,sicimx,   &
      &                     epstsf,epsalb,epssno,epswet,epszor,          &
      &                     epssmc,epsscv,eptsfc,                        &
      &                     epstg3,epsais,epsveg,epsvet,                 &
@@ -142,19 +113,8 @@
      &                     fabsl,fabss,cvmnl,cvmns,cvmxl,cvmxs,         &
      &                     cslpl,cslps,cabsl,cabss,epsvmn,epsvmx,       &
      &                     epsslp,epsabs                                &
-     &,                    sihlmx,sihlmn,sihomx,sihomn,sihsmx,          &
-     &                     sihsmn,sihimx,sihimn,sihjmx,sihjmn,          &
-     &                     siclmx,siclmn,sicomx,sicomn,sicsmx,          &
-     &                     sicsmn,sicimx,sicimn,sicjmx,sicjmn           &
      &,                    glacir_hice                                  &
-     &,                    vmnlmx,vmnlmn,vmnomx,vmnomn,vmnsmx,          &
-     &                     vmnsmn,vmnimx,vmnimn,vmnjmx,vmnjmn,          &
-     &                     vmxlmx,vmxlmn,vmxomx,vmxomn,vmxsmx,          &
-     &                     vmxsmn,vmximx,vmximn,vmxjmx,vmxjmn,          &
-     &                     slplmx,slplmn,slpomx,slpomn,slpsmx,          &
-     &                     slpsmn,slpimx,slpimn,slpjmx,slpjmn,          &
-     &                     abslmx,abslmn,absomx,absomn,abssmx,          &
-     &                     abssmn,absimx,absimn,absjmx,absjmn           &
+     &,                    abslmx,abslmn,abssmx,abssmn                  &
      &,                    sihnew
 
       integer imsk,jmsk,ifp,irtscv,irtacn,irtais,irtsno,irtzor,         &
@@ -247,90 +207,16 @@
 !     ???lmx .. max over bare land
 !     ???lmn .. min over bare land
 !     ???omx .. max over open ocean
-!     ???omn .. min over open ocean
-!     ???smx .. max over snow surface (land and sea-ice)
-!     ???smn .. min over snow surface (land and sea-ice)
-!     ???imx .. max over bare sea ice
-!     ???imn .. min over bare sea ice
-!     ???jmx .. max over snow covered sea ice
-!     ???jmn .. min over snow covered sea ice
-      parameter(orolmx=8000.,orolmn=-1000.,oroomx=3000.,oroomn=-1000.,
-     &          orosmx=8000.,orosmn=-1000.,oroimx=3000.,oroimn=-1000.,
-     &          orojmx=3000.,orojmn=-1000.)
 !  note: the range values for bare land and snow covered land
 !        (alblmx, alblmn, albsmx, albsmn) are set below
 !        based on whether the old or new radiation is selected
-      parameter(albomx=0.06,albomn=0.06,
-     &          albimx=0.80,albimn=0.06,
-     &          albjmx=0.80,albjmn=0.06)
-      parameter(sihlmx=0.0,sihlmn=0.0,sihomx=5.0,sihomn=0.0,
-     &          sihsmx=5.0,sihsmn=0.0,sihimx=5.0,sihimn=0.10,
-     &          sihjmx=5.0,sihjmn=0.10,glacir_hice=3.0)
-      parameter(siclmx=0.0,siclmn=0.0,sicomx=1.0,sicomn=0.0,
-     &          sicsmx=1.0,sicsmn=0.0,sicimx=1.0,sicjmx=1.0)
+      parameter(albomx=0.06,albimn=0.06)
+      parameter(glacir_hice=3.0,sicimx=1.0)
 
-      parameter(wetlmx=0.15,wetlmn=0.00,wetomx=0.15,wetomn=0.15,
-     &          wetsmx=0.15,wetsmn=0.15,wetimx=0.15,wetimn=0.15,
-     &          wetjmx=0.15,wetjmn=0.15)
-      parameter(snolmx=0.0,snolmn=0.0,snoomx=0.0,snoomn=0.0,
-     &          snosmx=55000.,snosmn=0.001,snoimx=0.,snoimn=0.0,
-     &          snojmx=10000.,snojmn=0.01)
-      parameter(zorlmx=300.,zorlmn=1.0,zoromx=1.0,zoromn=1.e-05,
-     &          zorsmx=300.,zorsmn=1.0,zorimx=1.0,zorimn=1.0,
-     &          zorjmx=1.0,zorjmn=1.0)
-      parameter(plrlmx=1000.,plrlmn=0.0,plromx=1000.0,plromn=0.0,
-     &          plrsmx=1000.,plrsmn=0.0,plrimx=1000.,plrimn=0.0,
-     &          plrjmx=1000.,plrjmn=0.0)
-      parameter(tsflmx=353.,tsflmn=173.0,tsfomx=313.0,tsfomn=271.2,
-     &          tsfsmx=305.0,tsfsmn=173.0,tsfimx=271.2,tsfimn=173.0,
-     &          tsfjmx=273.16,tsfjmn=173.0)
-      parameter(tg3lmx=310.,tg3lmn=200.0,tg3omx=310.0,tg3omn=200.0,
-     &          tg3smx=310.,tg3smn=200.0,tg3imx=310.0,tg3imn=200.0,
-     &          tg3jmx=310.,tg3jmn=200.0)
-      parameter(stclmx=353.,stclmn=173.0,stcomx=313.0,stcomn=200.0,
-     &          stcsmx=310.,stcsmn=200.0,stcimx=310.0,stcimn=200.0,
-     &          stcjmx=310.,stcjmn=200.0)
-      parameter(smclmx=0.55,smclmn=0.0,smcomx=1.0,smcomn=1.0,
-     &          smcsmx=0.55,smcsmn=0.0,smcimx=1.0,smcimn=1.0,
-     &          smcjmx=1.0,smcjmn=1.0)
-      parameter(scvlmx=0.0,scvlmn=0.0,scvomx=0.0,scvomn=0.0,
-     &          scvsmx=1.0,scvsmn=1.0,scvimx=0.0,scvimn=0.0,
-     &          scvjmx=1.0,scvjmn=1.0)
-      parameter(veglmx=1.0,veglmn=0.0,vegomx=0.0,vegomn=0.0,
-     &          vegsmx=1.0,vegsmn=0.0,vegimx=0.0,vegimn=0.0,
-     &          vegjmx=0.0,vegjmn=0.0)
-      parameter(vmnlmx=1.0,vmnlmn=0.0,vmnomx=0.0,vmnomn=0.0,
-     &          vmnsmx=1.0,vmnsmn=0.0,vmnimx=0.0,vmnimn=0.0,
-     &          vmnjmx=0.0,vmnjmn=0.0)
-      parameter(vmxlmx=1.0,vmxlmn=0.0,vmxomx=0.0,vmxomn=0.0,
-     &          vmxsmx=1.0,vmxsmn=0.0,vmximx=0.0,vmximn=0.0,
-     &          vmxjmx=0.0,vmxjmn=0.0)
-      parameter(slplmx=9.0,slplmn=1.0,slpomx=0.0,slpomn=0.0,
-     &          slpsmx=9.0,slpsmn=1.0,slpimx=0.,slpimn=0.,
-     &          slpjmx=0.,slpjmn=0.)
-!  note: the range values for bare land and snow covered land
-!        (alblmx, alblmn, albsmx, albsmn) are set below
-!        based on whether the old or new radiation is selected
-      parameter(absomx=0.0,absomn=0.0,
-     &          absimx=0.0,absimn=0.0,
-     &          absjmx=0.0,absjmn=0.0)
-!  vegetation type
-      parameter(vetlmx=20.,vetlmn=1.0,vetomx=0.0,vetomn=0.0,
-     &          vetsmx=20.,vetsmn=1.0,vetimx=0.,vetimn=0.,
-     &          vetjmx=0.,vetjmn=0.)
-!  soil type
-      parameter(sotlmx=16.,sotlmn=1.0,sotomx=0.0,sotomn=0.0,
-     &          sotsmx=16.,sotsmn=1.0,sotimx=0.,sotimn=0.,
-     &          sotjmx=0.,sotjmn=0.)
-!  soil color
-      parameter(soclmx=20.,soclmn=1.0,socomx=0.0,socomn=0.0,
-     &          socsmx=20.,socsmn=1.0,socimx=0.,socimn=0.,
-     &          socjmx=0.,socjmn=0.)
-!  fraction of vegetation for strongly and weakly zeneith angle dependent
-!  albedo
-      parameter(alslmx=1.0,alslmn=0.0,alsomx=0.0,alsomn=0.0,
-     &          alssmx=1.0,alssmn=0.0,alsimx=0.0,alsimn=0.0,
-     &          alsjmx=0.0,alsjmn=0.0)
+      parameter(snoomx=0.0,snosmx=55000.)
+      parameter(zoromx=1.0,zorimx=1.0)
+      parameter(tsfomn=271.2,tsfsmx=305.0,tsfimx=271.2)
+      parameter(smcomx=1.0,smcimx=1.0)
 !  criteria used for monitoring
       parameter(epstsf=0.01,epsalb=0.001,epssno=0.01,
      &          epswet=0.01,epszor=0.0000001,
