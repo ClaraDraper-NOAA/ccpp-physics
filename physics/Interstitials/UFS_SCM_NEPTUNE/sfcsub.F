@@ -1,4 +1,38 @@
      
+!  variable naming conventions:
+!     oro .. orography
+!     alb .. albedo
+!     wet .. soil wetness as defined for bucket model
+!     sno .. snow depth
+!     zor .. surface roughness length
+!     vet .. vegetation type
+!     plr .. plant evaporation resistance
+!     tsf .. surface skin temperature.  sea surface temp. over ocean.
+!     tg3 .. deep soil temperature (at 500cm)
+!     stc .. soil temperature (lsoil layrs)
+!     smc .. soil moisture (lsoil layrs)
+!     scv .. snow cover (not snow depth)
+!     ais .. sea ice mask (0 or 1)
+!     acn .. sea ice concentration (fraction)
+!     gla .. glacier (permanent snow) mask (0 or 1)
+!     mxi .. maximum sea ice extent (0 or 1)
+!     msk .. land ocean mask (0=ocean 1=land)
+!     cnp .. canopy water content
+!     cv  .. convective cloud cover
+!     cvb .. convective cloud base
+!     cvt .. convective cloud top
+!     sli .. land/sea/sea-ice mask. (1/0/2 respectively)
+!     veg .. vegetation cover
+!     sot .. soil type
+!     soc .. soil color
+!     sih .. sea ice thickness
+!     sic .. sea ice concentration
+!     swd .. actual snow depth
+!     slc .. liquid soil moisture (lsoil layers)
+!     vmn .. vegetation cover minimum
+!     vmx .. vegetation cover maximum
+!     slp .. slope type
+!     abs .. maximum snow albedo
 
       module sfccyc_module
       use machine , only : kind_io8,kind_io4
@@ -102,41 +136,6 @@
      &        monfcs, monmer, mondif, landice
       character(len=*), intent(in) :: input_nml_file(sz_nml)
 
-!  variable naming conventions:
-!     oro .. orography
-!     alb .. albedo
-!     wet .. soil wetness as defined for bucket model
-!     sno .. snow depth
-!     zor .. surface roughness length
-!     vet .. vegetation type
-!     plr .. plant evaporation resistance
-!     tsf .. surface skin temperature.  sea surface temp. over ocean.
-!     tg3 .. deep soil temperature (at 500cm)
-!     stc .. soil temperature (lsoil layrs)
-!     smc .. soil moisture (lsoil layrs)
-!     scv .. snow cover (not snow depth)
-!     ais .. sea ice mask (0 or 1)
-!     acn .. sea ice concentration (fraction)
-!     gla .. glacier (permanent snow) mask (0 or 1)
-!     mxi .. maximum sea ice extent (0 or 1)
-!     msk .. land ocean mask (0=ocean 1=land)
-!     cnp .. canopy water content
-!     cv  .. convective cloud cover
-!     cvb .. convective cloud base
-!     cvt .. convective cloud top
-!     sli .. land/sea/sea-ice mask. (1/0/2 respectively)
-!     veg .. vegetation cover
-!     sot .. soil type
-!     soc .. soil color
-!     sih .. sea ice thickness
-!     sic .. sea ice concentration
-!     swd .. actual snow depth
-!     slc .. liquid soil moisture (lsoil layers)
-!     vmn .. vegetation cover minimum
-!     vmx .. vegetation cover maximum
-!     slp .. slope type
-!     abs .. maximum snow albedo
-
 !  tgice=max ice temperature
 !  rlapse=lapse rate for sst correction due to surface angulation
       parameter(sllnd =1.0,slsea =0.0)
@@ -220,8 +219,6 @@
      &,    swdfcs(len), slcfcs(len,lsoil)
       real (kind=kind_io8) fsmcl(25), fsmcs(25), fstcl(25), fstcs(25)
 
-      real (kind=kind_io8) swratio(len,lsoil)
-      logical fixratio(lsoil)
       real (kind=kind_io8) csmcl(25), csmcs(25)
       real (kind=kind_io8) cstcl(25), cstcs(25)
       real (kind=kind_io8) slmskh(mdata)
@@ -410,6 +407,11 @@
         abslmn = .01
         abssmn = .01
       endif
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! 1. INITIAL SET UP 
+! run on first call only, then saved.
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
       if (ifp == 0) then
         ifp = 1
         do k=1,lsoil
@@ -604,6 +606,10 @@
 !  quality control max ice limit based on glacier points
         call qcmxice(glacir,amxice,len,me)
       endif                       ! first time loop finished
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! 2. Read in Climatology, plus various checks.
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
       do i=1,len
         sliclm(i) = 1.
         snoclm(i) = 0.
@@ -710,7 +716,12 @@
       if(fnstcc(1:8).eq.'        ') then
         call getstc(tsfclm,tg3clm,sliclm,len,lsoil,stcclm,tsfimx)
       endif
-! soil color
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! 3. Read in of analysis, plus various checks
+! this overwrites the climatology into the analysis 
+! if the latter is available
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
       if (me == 0) then
         write(6,*) '=============='
@@ -874,6 +885,9 @@
       endif
 ! soil color
 
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! 4. Read in of forecast, plus various checks
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 !  read in forecast fields if needed
       if (me == 0) then
@@ -900,21 +914,9 @@
         call tsfcor(tsffcs,orog,slmskw,ztsfc,len,-rlapse)
       endif
 
-!  compute soil moisture liquid-to-total ratio over land
-      do j=1, lsoil
-        do i=1, len
-          if(smcfcs(i,j) /=  0.)  then
-            swratio(i,j) = slcfcs(i,j)/smcfcs(i,j)
-          else
-            swratio(i,j) = -999.
-          endif
-        enddo
-      enddo
       if (lqcbgs .and. irtacn == 0) then
         call qcsli(slianl,slifcs,len,me)
         call albocn(albfcs,slmskl,albomx,len)
-
-
       endif
 
 !...   update annual cycle in the sst guess..
@@ -941,6 +943,12 @@
      &            snoanl,aisanl,slianl,tsfanl,albanl,
      &            zoranl,smcanl,
      &            smcclm,tsfsmx,albomx,zoromx,me)
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! 5. Blend clim/anal into forecast 
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 !  blend climatology and predicted fields
       if(me == 0) then
         write(6,*) '=============='
@@ -986,8 +994,6 @@
 !  set tsfc to tsnow over snow
       call snosfc(snoanl,tsfanl,tsfsmx,len,me)
 
-
-
       if(me == 0) then
         write(6,*) '=============='
         write(6,*) 'final results'
@@ -1008,7 +1014,10 @@
         ztsfc = 0.
         call tsfcor(tsfanl,orog,slmskw,ztsfc,len,rlapse)
       endif
-!  check the final merged product
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! 6. Copy anl field into fcast for output
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
       do i=1,len
         tsffcs(i) = tsfanl(i)
@@ -1083,48 +1092,9 @@
         endif
       enddo
 
-! ensure the consistency between slc and smc
-       do k=1, lsoil
-        fixratio(k) = .false.
-        if (fsmcl(k) < 99999.) fixratio(k) = .true.
-       enddo
-
-       if(me  == 0) then
-         print *,'dbgx --fixratio:',(fixratio(k),k=1,lsoil)
-       endif
-
-       do k=1, lsoil
-        if(fixratio(k)) then
-         do i = 1, len
-           if(swratio(i,k) == -999.) then
-            slcfcs(i,k) = smcfcs(i,k)
-           else
-            slcfcs(i,k) = swratio(i,k) * smcfcs(i,k)
-           endif
-           if (slifcs(i) /= 1.0) slcfcs(i,k) = 1.0  ! flag value for non-land points.
-         enddo
-        endif
-       enddo
-! set liquid soil moisture to a flag value of 1.0
-       if (landice) then
-         do i = 1, len
-           if (slifcs(i) == 1.0 .and. 
-     &         nint(vetfcs(i)) == veg_type_landice) then
-             do k=1, lsoil
-               slcfcs(i,k) = 1.0
-             enddo
-           endif
-         enddo
-       end if
-! ensure the consistency between snwdph and sheleg
-      if(fsnol < 99999.) then  
-        if(me == 0) then
-          print *,'dbgx -- scale snwdph from sheleg'
-        endif
-        do i = 1, len
-          if(slifcs(i) == 1.) swdfcs(i) = 10.* snofcs(i)
-        enddo
-      endif
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! 7. Some final checks on output
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 ! sea ice model only uses the liquid equivalent depth.
 ! so update the physical depth only for display purposes.
@@ -1134,6 +1104,7 @@
         if (slifcs(i) /= 1) swdfcs(i) = 3.*snofcs(i)
       enddo
 
+! CSD - remove this.
       do i = 1, len
         if(slifcs(i) == 1.) then
           if(snofcs(i) /= 0. .and. swdfcs(i) == 0.) then
