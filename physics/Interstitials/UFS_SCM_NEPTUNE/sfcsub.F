@@ -1,11 +1,5 @@
-!>\file sfcsub.F
-!! This file contains gribcode for each parameter.
+     
 
-!>\defgroup mod_sfcsub GFS sfcsub Module
-!!\ingroup mod_GFS_phys_time_vary 
-!> @{
-!! This module contains grib code for each parameter-used in subroutines sfccycle()
-!! and setrmsk().
       module sfccyc_module
       use machine , only : kind_io8,kind_io4
       implicit none
@@ -44,25 +38,6 @@
       write(message,fmt='(a,a,i0)') trim(prefix), '-', index
       end function message
 
-!>\ingroup mod_GFS_phys_time_vary
-!! This subroutine reads or interpolates surface climatology data in analysis
-!! and forecast mode.
-!!\param lugb   the unit number used in this subprogram
-!!\param len    number of points on which sfccyc operates
-!!\param lsoil  number of soil layers
-!!\param deltsfc       = fhcyc, frequcy for surface data cycling in hours
-!!\param iy,im,id,ih    year, month, day, and hour of initial state
-!!\param fh     forecast hour
-!!\param rla, rlo   latitude and longitudes of the len points
-!!\param slmsk
-!!\param orog
-!!\param orog_uf
-!!\param use_ufo
-!!\param nst_anl
-!!
-
-! CSD - to do: remove from argument list: 
-! sig1t
       subroutine sfccycle(lugb,len,lsoil,sig1t,deltsfc                  &
      &,                   iy,im,id,ih,fh,rla,rlo                        &
      &,                   slmskl,slmskw,orog,orog_uf,use_ufo,nst_anl    &
@@ -127,39 +102,6 @@
      &        monfcs, monmer, mondif, landice
       character(len=*), intent(in) :: input_nml_file(sz_nml)
 
-!>  This is a limited point version of surface program.
-!!
-!!  this program runs in two different modes:
-!!
-!!  1.  analysis mode (fh=0.)
-!!
-!!      this program merges climatology, analysis and forecast guess to create
-!!      new surface fields.  if analysis file is given, the program
-!!      uses it if date of the analysis matches with iy,im,id,ih (see note
-!!      below).
-!!
-!!  2.  forecast mode (fh.gt.0.)
-!!
-!!      this program interpolates climatology to the date corresponding to the
-!!      forecast hour.  if surface analysis file is given, for the corresponding
-!!      dates, the program will use it.
-!!
-!!\note if the date of the analysis does not match given iy,im,id,ih, (and fh),
-!!      the program searches an old analysis by going back 6 hours, then 12 hours,
-!!      then one day upto nrepmx days (parameter statement in the subrotine fixrd.
-!!      now defined as 8).  this allows the user to provide non-daily analysis to
-!!      be used.  if matching field is not found, the forecast guess will be used.
-!!
-!!      use of a combined earlier surface analyses and current analysis is
-!!      not allowed (as was done in the old version for snow analysis in which
-!!      old snow analysis is used in combination with initial guess), except
-!!      for sea surface temperature.  for sst anolmaly interpolation, you need to
-!!      set lanom=.true. and must provide sst analysis at initial time.
-!!
-!!      if you want to do complex merging of past and present surface field analysis,
-!!      you need to create a separate file that contains daily surface field.
-!!
-!!      for a dead start, do not supply fnbgsi or set fnbgsi='        '
 !  variable naming conventions:
 !     oro .. orography
 !     alb .. albedo
@@ -195,21 +137,13 @@
 !     slp .. slope type
 !     abs .. maximum snow albedo
 
-!  definition of land/sea mask. sllnd for land and slsea for sea.
-!  definition of sea/ice mask. aicice for ice, aicsea for sea.
 !  tgice=max ice temperature
 !  rlapse=lapse rate for sst correction due to surface angulation
       parameter(sllnd =1.0,slsea =0.0)
       parameter(aicice=1.0,aicsea=0.0)
       parameter(tgice=271.2)
       parameter(rlapse=0.65e-2)
-!  max/min of fields for check and replace.
-!     ???lmx .. max over bare land
-!     ???lmn .. min over bare land
-!     ???omx .. max over open ocean
-!  note: the range values for bare land and snow covered land
-!        (alblmx, alblmn, albsmx, albsmn) are set below
-!        based on whether the old or new radiation is selected
+
       parameter(albomx=0.06,albimn=0.06)
       parameter(glacir_hice=3.0,sicimx=1.0)
 
@@ -232,42 +166,6 @@
       parameter(qctsfs=293.16,qcsnos=100.,qctsfi=280.16)
 !  parameters to obtain snow depth from snow cover and temperature
       parameter(snwmin=5.0,snwmax=100.)
-!  coefficients of blending forecast and interpolated clim
-!  (or analyzed) fields over sea or land(l) (not for clouds)
-!  1.0 = use of forecast
-!  0.0 = replace with interpolated analysis
-!    these values are set for analysis mode.
-!   variables                  land                 sea
-!   ---------------------------------------------------------
-!   surface temperature        forecast             analysis
-!   surface temperature        forecast             forecast (over sea ice)
-!   albedo                     forecast/analysis    analysis
-!   sea-ice                    analysis             analysis
-!   snow                       forecast/analysis    forecast (over sea ice)
-!   roughness                  forecast/analysis    forecast
-!   plant resistance           analysis             analysis
-!   soil wetness (layer)       weighted average     analysis
-!   soil temperature           forecast             analysis
-!   canopy waver content       forecast             forecast
-!   convective cloud cover     forecast             forecast
-!   convective cloud bottm     forecast             forecast
-!   convective cloud top       forecast             forecast
-!   vegetation cover           analysis             analysis
-!   vegetation type            analysis             analysis
-!   soil type                  analysis             analysis
-!   soil color                 analysis             analysis
-!   sea-ice thickness          forecast             forecast
-!   sea-ice concentration      analysis             analysis
-!   vegetation cover min       analysis             analysis
-!   vegetation cover max       analysis             analysis
-!   max snow albedo            analysis             analysis
-!   slope type                 analysis             analysis
-!   liquid soil wetness        analysis-weighted    analysis
-!   actual snow depth          forecast/analysis-weighted    analysis
-!  note: if analysis file is not given, then time interpolated climatology
-!        is used.  if analyiss file is given, it will be used as far as the
-!        date and time matches.  if they do not match, it uses forecast.
-!  critical percentage value for aborting bad points when lgchek=.true.
       logical lgchek
       data lgchek/.true./
       data critp1,critp2,critp3/80.,80.,25./
@@ -308,7 +206,7 @@
      &,    smcanl(len,lsoil), stcanl(len,lsoil)                         &
      &,    sihanl(len), sicanl(len)                                     &
      &,    vmnanl(len), vmxanl(len), slpanl(len), absanl(len)
-      real (kind=kind_io8) tsfan0(len) !  sea surface temperature analysis at ft=0.
+      real (kind=kind_io8) tsfan0(len)
 !  predicted surface fields (last characters 'fcs' indicates forecast)
       real (kind=kind_io8) tsffcs(len), wetfcs(len),   snofcs(len)      &
      &,    zorfcs(len), albfcs(len,4), aisfcs(len)                      &
@@ -342,9 +240,7 @@
       logical :: lqcbgs, lprnt
       logical lanom
 
-! CSD - to-do: variables removed from argument
       real (kind=kind_io8) sig1t(len)
-! CSD - do-do: variabes to remove from namelist
       logical :: ldebug 
 
       namelist/namsfc/fnglac,fnmxic,
@@ -369,10 +265,7 @@
      &                gausm,
      &                monclm, monanl, monfcs, monmer, mondif, igrdbg,
      &                blnmsk, bltmsk, landice,
-! CSD - namelist variables to delete
      &                ldebug
-
-
 
       data gausm/.true./,blnmsk/0.0/, bltmsk/90.0/
      &,    igrdbg/-1/
@@ -479,8 +372,7 @@
      &,    imsk, jmsk, slmskh, blnmsk, bltmsk
      &,    glacir, amxice, tsfcl0
      &,    caisl, caiss, cvegs
-! Set number of threads num_threads in sfccyc_module for later use
-! to the value received from the calling routine (nthrds)
+
       num_threads = nthrds
       lprnt = .false.
 
@@ -597,11 +489,7 @@
         csnol = 0.                       !...  snow over land
         if (fsnol >= 99999.) csnol = 1.
         if (fsnol > 0. .and. fsnol < 99999)  csnol = exp(-deltf/fsnol)
-!       using the same way to bending snow as narr when fsnol is the negative value
-!       the magnitude of fsnol is the thread to determine the lower and upper bound
-!       of final swe
-        if (fsnol < 0.) csnol = fsnol
-        csnos = 0.                       !...  snow over sea
+        csnos = 0.
         if (fsnos >= 99999.) csnos = 1.
         if (fsnos > 0 .and. fsnos < 99999)  csnos = exp(-deltf/fsnos)
         czorl = 0.                       !...  roughness length over land
@@ -682,6 +570,7 @@
         cabss = 0.                       !... snow albedo over sea
         if (fabss >= 99999.) cabss = 1.
         if (fabss > 0. .and. fabss < 99999)  cabss = exp(-deltf/fabss)
+
 !> - Call hmskrd() to read a high resolution mask field for use in grib interpolation
         call hmskrd(lugb,imsk,jmsk,fnmskh,                              &
      &              kpdmsk,slmskh,gausm,blnmsk,bltmsk,me)
@@ -894,10 +783,6 @@
       call scale(vmnanl,len,zsca)
       call scale(vmxanl,len,zsca)
       call scale(absanl,len,zsca)
-!  interpolate climatology but fixing initial anomaly
-      if(fh > 0.0 .and. fntsfa(1:8) /= '        ' .and. lanom) then
-        call anomint(tsfan0,tsfclm,tsfcl0,tsfanl,len)
-      endif
 !    if the tsfanl is at sea level, then bring it to the surface using
 !    unfiltered orography (for lakes).  if the analysis is at lake surface
 !    as in the nst model, then this call should be removed - moorthi 09/23/2011
@@ -2194,29 +2079,9 @@
         endif
       endif
 ! tsf0
-      if(fntsfa(1:8).ne.'        ' .and. lanom) then
-        call fixrda(lugb,fntsfa,kpdtsf,slmskw,
-     &              iy,im,id,ih,0.,tsfan0,len,iret
-     &,             imsk, jmsk, slmskh, gaus,blno, blto
-     &,             outlat, outlon, me)
-        if(iret == 1) then
-          write(6,*) 'FATAL ERROR: t surface at ft=0 analysis'
-          write(6,*) 'read error.'
-          call abort
-        elseif(iret == -1) then
-          if (me == 0) then
-            write(6,*) 'FATAL ERROR: Could not find t surface'
-            write(6,*) 'analysis at ft=0.'
-          endif
-          call abort
-        else
-          print *,'t surface analysis at ft=0 found.'
-        endif
-      else
-        do i=1,len
+      do i=1,len
           tsfan0(i) = -999.9
-        enddo
-      endif
+      enddo
 !  albedo
       irtalb = 0
       if(fnalba(1:8).ne.'        ') then
@@ -3254,12 +3119,6 @@
         qstcs(k) = 1. - rstcs(k)
       enddo
 !  merging
-      if(me .eq. 0) then
-        print *, 'dbgx-- csmcl:', (csmcl(k),k=1,lsoil)
-        print *, 'dbgx-- rsmcl:', (rsmcl(k),k=1,lsoil)
-        print *, 'dbgx-- csnol, csnos:',csnol,csnos
-        print *, 'dbgx-- rsnol, rsnos:',rsnol,rsnos
-      endif
       len_thread_m  = (len+num_threads-1) / num_threads
 
 !$omp parallel do private(i1_t,i2_t,it,i)
@@ -3302,14 +3161,7 @@
         if(slmskl(i) == one .or. slianl(i) > zero) then
           tsfanl(i) = tsffcs(i)*rtsfl + tsfanl(i)*qtsfl
           aisanl(i) = aisfcs(i)*raisl + aisanl(i)*qaisl
-          if(rsnol.ge.0)then
-            snoanl(i) = snofcs(i)*rsnol + snoanl(i)*qsnol
-          else  ! envelope method
-            if(snoanl(i).ne.0)then
-             snoanl(i) = max(-snoanl(i)/rsnol,
-     &                   min(-snoanl(i)*rsnol, snofcs(i)))
-            endif
-          endif
+          snoanl(i) = snofcs(i)*rsnol + snoanl(i)*qsnol
           zoranl(i) = zorfcs(i)*rzorl + zoranl(i)*qzorl
           veganl(i) = vegfcs(i)*rvegl + veganl(i)*qvegl
           vmnanl(i) = vmnfcs(i)*rvmnl + vmnanl(i)*qvmnl
@@ -3568,8 +3420,6 @@
      &          kount1,' points (',per,'percent)'
         endif
       endif
-!  remove isolated open ocean surrounded by sea ice and/or land
-!  remove isolated open ocean surrounded by sea ice and/or land
       return
       end
 
@@ -3820,25 +3670,6 @@ cjfe
       return
 
       end subroutine landtyp
-
-!-----------------------------------------------------------------------
-!>\ingroup mod_sfcsub
-!! The subroutine conducts time interpolation of anomalies,
-!! and add initial anomaly to date interpolated climatology.
-      subroutine anomint(tsfan0,tsfclm,tsfcl0,tsfanl,len)
-      use machine , only : kind_io8,kind_io4
-      implicit none
-      integer i,len
-      real (kind=kind_io8) tsfanl(len), tsfan0(len),                    &
-     &                     tsfclm(len), tsfcl0(len)
-!  time interpolation of anomalies
-!  add initial anomaly to date interpolated climatology
-      write(6,*) 'anomint'
-      do i=1,len
-        tsfanl(i) = tsfan0(i) - tsfcl0(i) + tsfclm(i)
-      enddo
-      return
-      end
 
 !>\ingroup mod_sfcsub
       subroutine clima(lugb,iy,im,id,ih,fh,len,lsoil,slmskl,slmskw,     &
