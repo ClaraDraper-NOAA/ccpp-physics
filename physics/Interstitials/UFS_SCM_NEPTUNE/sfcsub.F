@@ -704,8 +704,6 @@
       if(fnscvc(1:8).eq.'        ') then
         call getscv(snoclm,scvclm,len)
       endif
-!  set tsfc over snow to tsfsmx if greater
-      call snosfc(snoclm,tsfclm,tsfsmx,len,me)
 !  quality control
 !  get soil temp and moisture (after all the qcs are completed)
       !-- soil moisture
@@ -863,7 +861,6 @@
         if (.not.landice) then
           call snodpth2(glacir,snosmx,snoanl, len, me)
         endif
-        call snosfc(snoanl,tsfanl,tsfsmx,len,me)
         call getscv(snoanl,scvanl,len)
       else
         crit = 0.5
@@ -872,7 +869,6 @@
         call snodpth(scvanl,slianl,tsfanl,snoclm,
      &               glacir,snwmax,snwmin,landice,len,snoanl,me)
         call qcsnow(scvanl,slmskl,aisanl,glacir,len,snosmx,landice,me)
-        call snosfc(snoanl,tsfanl,tsfsmx,len,me)
       endif
 !  get soil temp and moisture
       if(fnsmca(1:8) == '        ' .and. fnsmcc(1:8) == '        ') then
@@ -981,8 +977,6 @@
      &           irtvmn,irtvmx,irtslp,irtabs,
      &           irtvet,irtsot,irtsoc,irtalf,landice,me)
 
-      call setzro(snoanl,epssno,len)
-
 !  new ice/melted ice
       call newice(slianl,slifcs,tsfanl,tsffcs,len,lsoil,
      &            sihnew,aislim,sihanl,sicanl,
@@ -991,14 +985,12 @@
      &            tsfomn,tsfimx,albimn,zorimx,tgice,
      &            rla,rlo,me)
 
-!  set tsfc to tsnow over snow
-      call snosfc(snoanl,tsfanl,tsfsmx,len,me)
-
       if(me == 0) then
         write(6,*) '=============='
         write(6,*) 'final results'
         write(6,*) '=============='
       endif
+
 !  foreward correction to tg3 and tsf at the last stage
       if (use_ufo) then
 ! The tiled version of the substrate temperature is properly
@@ -1039,6 +1031,9 @@
         slpfcs(i) = slpanl(i)
         absfcs(i) = absanl(i)
       enddo
+
+
+      ! Sets stc-fcs to tsf-fcs over ocean
       do j = 1,lsoil
         do i = 1,len
           smcfcs(i,j) = smcanl(i,j)
@@ -1049,17 +1044,20 @@
           endif
         enddo
       enddo
+
       do j = 1,4
         do i = 1,len
           albfcs(i,j) = albanl(i,j)
         enddo
       enddo
+
       do j = 1,2
         do i = 1,len
           alffcs(i,j) = alfanl(i,j)
         enddo
       enddo
-
+ 
+      ! set sea ice values over sea ice and sea (redundant?) 
       do i=1,len
         if (slmskw(i) == zero) then
           crit = min_ice(i)
@@ -1104,16 +1102,6 @@
         if (slifcs(i) /= 1) swdfcs(i) = 3.*snofcs(i)
       enddo
 
-! CSD - remove this.
-      do i = 1, len
-        if(slifcs(i) == 1.) then
-          if(snofcs(i) /= 0. .and. swdfcs(i) == 0.) then
-            print *,'dbgx --scale snwdph from sheleg',                  &
-     &              i, swdfcs(i), snofcs(i)
-            swdfcs(i) = 10.* snofcs(i)
-          endif
-        endif
-      enddo
 ! landice mods  - impose same minimum snow depth at
 !                 landice as noah lsm.  also ensure
 !                 lower thermal boundary condition
@@ -1130,6 +1118,7 @@
            endif
          enddo
        endif
+! this is to make the logic above work
        do i=1,len
          if (nint(slmskl(i)) == 1 .and. nint(slmskw(i)) == 0) then
            slifcs(i) = slmskl(i)  ! resetting slmsk to land value where land/wate/ice coexist
@@ -3256,10 +3245,9 @@
             albanl(i,2) = albsea
             albanl(i,3) = albsea
             albanl(i,4) = albsea
-            snoanl(i)   = snosea
+            snoanl(i)   = 0.
             zoranl(i)   = zorsea
             do k = 1, lsoil
-              smcanl(i,k) = smcsea
               stcanl(i,k) = tgice 
             enddo
             sihanl(i) = 0.
@@ -3276,7 +3264,6 @@
             snoanl(i)   = 0.
             zoranl(i)   = zorice
             do k = 1, lsoil
-              smcanl(i,k) = smcice
               stcanl(i,k) = tgice
             enddo
             sihanl(i) = sihnew
