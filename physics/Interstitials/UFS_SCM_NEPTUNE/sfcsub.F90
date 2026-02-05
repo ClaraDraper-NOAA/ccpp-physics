@@ -44,7 +44,7 @@
              kpdmxi,kpdscv,kpdsmc,kpdoro,kpdmsk,kpdstc,kpdacn,kpdveg, &
              kpdvet,kpdsot,kpdsoc,                                       &
              kpdvmn,kpdvmx,kpdslp,kpdabs &
-     ,       kpdsnd, kpdabs_0, kpdabs_1, kpdalb(4)
+     ,kpdsnd, kpdabs_0, kpdabs_1, kpdalb(4)
       parameter(kpdtsf=11,  kpdwet=86, kpdsno=65,  kpdzor=83, &
                kpdais=91,  kpdtg3=11, kpdplr=224, &
                kpdgla=238, kpdmxi=91, kpdscv=238, kpdsmc=144, &
@@ -73,18 +73,18 @@
       end function message
 
       subroutine sfccycle(lugb,len,lsoil,sig1t,deltsfc                  &
-     ,                   iy,im,id,ih,fh,rla,rlo                        &
-     ,                   slmskl,slmskw,orog,orog_uf,use_ufo,nst_anl    &
-     ,                   sihfcs,sicfcs,sitfcs                          &
-     ,                   swdfcs,slcfcs                                 &
-     ,                   vmnfcs,vmxfcs,slpfcs,absfcs                   &
-     ,                   tsffcs,snofcs,zorfcs,albfcs,tg3fcs            &
-     ,                   cnpfcs,smcfcs,stcfcs,slifcs,aisfcs            &
-     ,                   vegfcs,vetfcs,sotfcs,socfcs,alffcs            &
-     ,                   cvfcs,cvbfcs,cvtfcs,me,nthrds,nlunit          &
-     ,                   sz_nml,input_nml_file                         &
-     ,                   min_ice                                       &
-     ,                   ialb,isot,ivegsrc,tile_num_ch,i_index,j_index)
+     ,iy,im,id,ih,fh,rla,rlo                        &
+     ,slmskl,slmskw,orog,orog_uf,use_ufo,nst_anl    &
+     ,sihfcs,sicfcs,sitfcs                          &
+     ,swdfcs,slcfcs                                 &
+     ,vmnfcs,vmxfcs,slpfcs,absfcs                   &
+     ,tsffcs,snofcs,zorfcs,albfcs,tg3fcs            &
+     ,cnpfcs,smcfcs,stcfcs,slifcs,aisfcs            &
+     ,vegfcs,vetfcs,sotfcs,socfcs,alffcs            &
+     ,cvfcs,cvbfcs,cvtfcs,me,nthrds,nlunit          &
+     ,sz_nml,input_nml_file                         &
+     ,min_ice                                       &
+     ,ialb,isot,ivegsrc,tile_num_ch,i_index,j_index)
 
       use machine , only : kind_io8,kind_io4
       implicit none
@@ -116,22 +116,22 @@
                           fsocl,fsocs,                                 &
                           fvetl,fplrs,fvegl,fvegs,                     &
                           falfs,falfl,fh,crit,zsca,ztsfc,tem1,tem2     &
-     ,                    fsihl,fsihs,fsicl,fsics,                     &
+     ,fsihl,fsihs,fsicl,fsics,                     &
                           csihl,csihs,csicl,csics,epssih,epssic        &
-     ,                    fvmnl,fvmns,fvmxl,fvmxs,fslpl,fslps,         &
+     ,fvmnl,fvmns,fvmxl,fvmxs,fslpl,fslps,         &
                           fabsl,fabss,cvmnl,cvmns,cvmxl,cvmxs,         &
                           cslpl,cslps,cabsl,cabss,epsvmn,epsvmx,       &
                           epsslp,epsabs                                &
-     ,                    glacir_hice                                  &
-     ,                    abslmx,abslmn,abssmx,abssmn                  &
-     ,                    sihnew
+     ,glacir_hice                                  &
+     ,abslmx,abslmn,abssmx,abssmn                  &
+     ,sihnew
 
       integer imsk,jmsk,ifp,irtscv,irtacn,irtais,irtsno,irtzor,         &
              irtalb,irtsot,irtsoc,irtalf,j,irtvet,irtsmc,irtstc,irtveg,&  &
              irtwet,k,iprnt,kk,irttsf,iret,i,igrdbg,iy,im,id,          &
              lugb,len,lsoil,ih,                                        &
              irttg3,nlunit,sz_nml,ialb                                 &
-     ,       irtvmn, irtvmx, irtslp, irtabs, isot, ivegsrc
+     ,irtvmn, irtvmx, irtslp, irtabs, isot, ivegsrc
       logical gausm, monclm, monanl,                                    &
              monfcs, monmer, mondif, landice
       character(len=*), intent(in) :: input_nml_file(sz_nml)
@@ -178,45 +178,45 @@
 !     tsfcl0 is the climatological tsf at fh=0
 !  climatology surface fields (last character 'c' or 'clm' indicate climatology)
       character*500 fntsfc,fnwetc,fnsnoc,fnzorc,fnalbc,fnaisc           &
-     ,             fntg3c,fnscvc,fnsmcc,fnstcc,fnacnc                  &
-     ,             fnvegc,fnvetc,fnsotc,fnsocc                         &
-     ,             fnvmnc,fnvmxc,fnslpc,fnabsc, fnalbc2
+     ,fntg3c,fnscvc,fnsmcc,fnstcc,fnacnc                  &
+     ,fnvegc,fnvetc,fnsotc,fnsocc                         &
+     ,fnvmnc,fnvmxc,fnslpc,fnabsc, fnalbc2
       real (kind=kind_io8) tsfclm(len), wetclm(len),   snoclm(len)      &
-     ,    zorclm(len), albclm(len,4), aisclm(len)                      &
-     ,    tg3clm(len), acnclm(len),   cnpclm(len)                      &
-     ,    cvclm (len), cvbclm(len),   cvtclm(len)                      &
-     ,    scvclm(len), tsfcl2(len),   vegclm(len)                      &
-     , vetclm(len), sotclm(len), socclm(len),alfclm(len,2), sliclm(len)& &
-     ,    smcclm(len,lsoil), stcclm(len,lsoil)                         &
-     ,    sihclm(len), sicclm(len)                                     &
-     ,    vmnclm(len), vmxclm(len), slpclm(len), absclm(len)
+     ,zorclm(len), albclm(len,4), aisclm(len)                      &
+     ,tg3clm(len), acnclm(len),   cnpclm(len)                      &
+     ,cvclm (len), cvbclm(len),   cvtclm(len)                      &
+     ,scvclm(len), tsfcl2(len),   vegclm(len)                      &
+     ,vetclm(len), sotclm(len), socclm(len),alfclm(len,2), sliclm(len)& &
+     ,smcclm(len,lsoil), stcclm(len,lsoil)                         &
+     ,sihclm(len), sicclm(len)                                     &
+     ,vmnclm(len), vmxclm(len), slpclm(len), absclm(len)
 !  analyzed surface fields (last character 'a' or 'anl' indicate analysis)
       character*500 fntsfa,fnweta,fnsnoa,fnzora,fnalba,fnaisa           &
-     ,             fntg3a,fnscva,fnsmca,fnstca,fnacna                  &
-     ,             fnvega,fnveta,fnsota,fnsoca                         &
-     ,             fnvmna,fnvmxa,fnslpa,fnabsa
+     ,fntg3a,fnscva,fnsmca,fnstca,fnacna                  &
+     ,fnvega,fnveta,fnsota,fnsoca                         &
+     ,fnvmna,fnvmxa,fnslpa,fnabsa
       real (kind=kind_io8) tsfanl(len), wetanl(len),   snoanl(len)      &
-     ,    zoranl(len), albanl(len,4), aisanl(len)                      &
-     ,    tg3anl(len), acnanl(len),   cnpanl(len)                      &
-     ,    cvanl (len), cvbanl(len),   cvtanl(len)                      &
-     ,    scvanl(len), tsfan2(len),   veganl(len)                      &
-     ,    vetanl(len), sotanl(len),   socanl(len)                      &
-     ,    alfanl(len,2), slianl(len)                                   &
-     ,    smcanl(len,lsoil), stcanl(len,lsoil)                         &
-     ,    sihanl(len), sicanl(len)                                     &
-     ,    vmnanl(len), vmxanl(len), slpanl(len), absanl(len)
+     ,zoranl(len), albanl(len,4), aisanl(len)                      &
+     ,tg3anl(len), acnanl(len),   cnpanl(len)                      &
+     ,cvanl (len), cvbanl(len),   cvtanl(len)                      &
+     ,scvanl(len), tsfan2(len),   veganl(len)                      &
+     ,vetanl(len), sotanl(len),   socanl(len)                      &
+     ,alfanl(len,2), slianl(len)                                   &
+     ,smcanl(len,lsoil), stcanl(len,lsoil)                         &
+     ,sihanl(len), sicanl(len)                                     &
+     ,vmnanl(len), vmxanl(len), slpanl(len), absanl(len)
       real (kind=kind_io8) tsfan0(len)
 !  predicted surface fields (last characters 'fcs' indicates forecast)
       real (kind=kind_io8) tsffcs(len), wetfcs(len),   snofcs(len)      &
-     ,    zorfcs(len), albfcs(len,4), aisfcs(len)                      &
-     ,    tg3fcs(len), cnpfcs(len)                                     &
-     ,    cvfcs (len), cvbfcs(len),   cvtfcs(len)                      &
-     ,    slifcs(len), vegfcs(len)                                     &
-     ,    vetfcs(len), sotfcs(len), socfcs(len),   alffcs(len,2)       &
-     ,    smcfcs(len,lsoil), stcfcs(len,lsoil)                         &
-     ,    sihfcs(len), sicfcs(len), sitfcs(len)                        &
-     ,    vmnfcs(len), vmxfcs(len), slpfcs(len), absfcs(len)           &
-     ,    swdfcs(len), slcfcs(len,lsoil)
+     ,zorfcs(len), albfcs(len,4), aisfcs(len)                      &
+     ,tg3fcs(len), cnpfcs(len)                                     &
+     ,cvfcs (len), cvbfcs(len),   cvtfcs(len)                      &
+     ,slifcs(len), vegfcs(len)                                     &
+     ,vetfcs(len), sotfcs(len), socfcs(len),   alffcs(len,2)       &
+     ,smcfcs(len,lsoil), stcfcs(len,lsoil)                         &
+     ,sihfcs(len), sicfcs(len), sitfcs(len)                        &
+     ,vmnfcs(len), vmxfcs(len), slpfcs(len), absfcs(len)           &
+     ,swdfcs(len), slcfcs(len,lsoil)
       real (kind=kind_io8) fsmcl(25), fsmcs(25), fstcl(25), fstcs(25)
 
       real (kind=kind_io8) csmcl(25), csmcs(25)
@@ -265,9 +265,9 @@
                      ldebug
 
       data gausm/.true./,blnmsk/0.0/, bltmsk/90.0/ &
-     ,    igrdbg/-1/ &
-     ,    monclm/.false./, monanl/.false./, monfcs/.false./ &
-     ,    monmer/.false./,  mondif/.false./,  landice/.true./
+     ,igrdbg/-1/ &
+     ,monclm/.false./, monanl/.false./, monfcs/.false./ &
+     ,monmer/.false./,  mondif/.false./,  landice/.true./
 !  defaults file names
       data fnmskh/'global_slmask.t126.grb'/
       data fnalbc/'global_albedo4.1x1.grb'/
@@ -363,12 +363,12 @@
           cstcs,  cvegl,  cvwgs, cvetl, cvets, csotl, csots, &
           csocl, csocs,                  &
           csmcl &
-     ,    csihl,  csihs,  csicl, csics &
-     ,    cvmnl,  cvmns,  cvmxl, cvmxs, cslpl, cslps, &
+     ,csihl,  csihs,  csicl, csics &
+     ,cvmnl,  cvmns,  cvmxl, cvmxs, cslpl, cslps, &
           cabsl,  cabss &
-     ,    imsk, jmsk, slmskh, blnmsk, bltmsk &
-     ,    glacir, amxice, tsfcl0 &
-     ,    caisl, caiss, cvegs
+     ,imsk, jmsk, slmskh, blnmsk, bltmsk &
+     ,glacir, amxice, tsfcl0 &
+     ,caisl, caiss, cvegs
 
       num_threads = nthrds
       lprnt = .false.
@@ -580,7 +580,7 @@
           write(6,*) ' '
           write(6,*) ' lugb=',lugb,' len=',len, ' lsoil=',lsoil
           write(6,*) 'iy=',iy,' im=',im,' id=',id,' ih=',ih,' fh=',fh   &
-     ,            ' gausm=',gausm,' blnmsk=',blnmsk,' bltmsk=',bltmsk
+     ,' gausm=',gausm,' blnmsk=',blnmsk,' bltmsk=',bltmsk
           write(6,*) ' '
         endif
 !  reading permanent/extreme features (glacier points and maximum ice extent)
@@ -591,15 +591,15 @@
         kpd9 = -1
         kpd7 = -1
         call fixrdc(lugb,fnglac,kpdgla,kpd7,kpd9,slmskl &
-     ,             glacir,len,iret &
-     ,             imsk, jmsk, slmskh, gausm, blnmsk, bltmsk &
-     ,             rla, rlo, me)
+     ,glacir,len,iret &
+     ,imsk, jmsk, slmskh, gausm, blnmsk, bltmsk &
+     ,rla, rlo, me)
 !  read maximum ice extent
         kpd7 = -1
         call fixrdc(lugb,fnmxic,kpdmxi,kpd7,kpd9,slmskl &
-     ,             amxice,len,iret &
-     ,             imsk, jmsk, slmskh, gausm, blnmsk, bltmsk &
-     ,             rla, rlo, me)
+     ,amxice,len,iret &
+     ,imsk, jmsk, slmskh, gausm, blnmsk, bltmsk &
+     ,rla, rlo, me)
         crit=0.5
         call rof01(glacir,len,'ge',crit)
         call rof01(amxice,len,'ge',crit)
@@ -637,8 +637,8 @@
                 kpdvet,kpdsot,kpdsoc,kpdalf,tsfcl0,    &
                 kpdvmn,kpdvmx,kpdslp,kpdabs, &
                 deltsfc, lanom &
-     ,          imsk, jmsk, slmskh, rla, rlo, gausm, blnmsk, bltmsk,me &
-     ,          lprnt,iprnt,fnalbc2,ialb,tile_num_ch,i_index,j_index)
+     ,imsk, jmsk, slmskh, rla, rlo, gausm, blnmsk, bltmsk,me &
+     ,lprnt,iprnt,fnalbc2,ialb,tile_num_ch,i_index,j_index)
 
 !  scale surface roughness and albedo to model required units
 
@@ -774,9 +774,9 @@
                 irttsf,irtwet,irtsno,irtzor,irtalb,irtais, &
                 irttg3,irtscv,irtacn,irtsmc,irtstc,irtveg, &
                 irtvet,irtsot,irtsoc,irtalf                 &
-     ,          irtvmn,irtvmx,irtslp,irtabs, &
+     ,irtvmn,irtvmx,irtslp,irtabs, &
                 imsk, jmsk, slmskh, rla, rlo, gausm, blnmsk, bltmsk &
-     ,          me, lanom)
+     ,me, lanom)
 
 !  scale zor and alb to match forecast model units
       zsca = 100.
@@ -1143,7 +1143,7 @@
 
       if (me .eq. 0) then
         write(6,*)' imsk=',imsk,' jmsk=',jmsk,' xdata=',xdata,' ydata=' &
-     ,             ydata
+     ,ydata
       endif
 
       call fixrdg(lugb,imsk,jmsk,fnmskh, &
@@ -1153,7 +1153,7 @@
          slmskh(i) = nint(slmskh(i))
       enddo
       return
-      end
+      end subroutine hmskrd
 
 !>\ingroup mod_sfcsub
       subroutine fixrdg(lugb,idim,jdim,fngrib,                          &
@@ -1229,10 +1229,10 @@
         blto = kgds(4)*1.d-3
         gdata(1:idim*jdim) = data8(1:idim*jdim)
         if (me == 0) write(6,*) 'idim,jdim=',idim,jdim &
-     ,                ' gaus=',gaus,' blno=',blno,' blto=',blto
+     ,' gaus=',gaus,' blno=',blno,' blto=',blto
       else
         if (me ==. 0) write(6,*) 'idim,jdim=',idim,jdim &
-     ,                ' gaus=',gaus,' blno=',blno,' blto=',blto
+     ,' gaus=',gaus,' blno=',blno,' blto=',blto
         write(6,*) ' FATAL ERROR in getgb : jret=',jret
         write(6,*) ' kpds(13)=',kpds(13),' kpds(15)=',kpds(15)
         call abort
@@ -1240,7 +1240,7 @@
       deallocate(data8)
       deallocate(lbms)
       return
-      end
+      end subroutine fixrdg
 
 !>\ingroup mod_sfcsub
 !! This subroutine get area of the grib record.
@@ -1377,7 +1377,7 @@
         call abort
       endif
       return
-      end
+      end subroutine getarea
 
 !>\ingroup mod_sfcsub
       subroutine subst(data,imax,jmax,dlon,dlat,ijordr)
@@ -1439,14 +1439,14 @@
         deallocate (work, stat=iret)
       endif
       return
-      end
+      end subroutine subst
 
 !>\ingroup mod_sfcsub
 !! This subroutine conducts interpolation from lat/lon to Gaussian
 !! grid to other lat/lon grid.
       subroutine la2ga(regin,imxin,jmxin,rinlon,rinlat,rlon,rlat,inttyp,& &
                       gauout,len,lmask,rslmsk,slmask                   &
-     ,                outlat, outlon,me)
+     ,outlat, outlon,me)
       use machine , only : kind_io8,kind_io4
       implicit none
       real (kind=kind_io8) wei4,wei3,wei2,sum2,sum1,sum3,wei1,sum4,     &
@@ -1701,9 +1701,9 @@
 
               if (num_threads == 1) then
                 print*,'no matching mask found ',i,i1,j1,ix,jx          &
-     ,                ' slmask=',slmask(i),' me=',me                   &
-     ,                ' outlon=',outlon(i),' outlat=',outlat(i) &
-     ,                'set to default value.'
+     ,' slmask=',slmask(i),' me=',me                   &
+     ,' outlon=',outlon(i),' outlat=',outlat(i) &
+     ,'set to default value.'
               endif
               gauout(i) = 0.0
 
@@ -1813,7 +1813,7 @@
                   write(6,*) 'rslmsk=',rslmsk(i1,j1),rslmsk(i1,j2), &
                                       rslmsk(i2,j1),rslmsk(i2,j2)
                   write(6,*) 'i=',i,' slmask(i)=',slmask(i) &
-     ,           ' outlon=',outlon(i),' outlat=',outlat(i)
+     ,' outlon=',outlon(i),' outlat=',outlat(i)
                 endif
               endif
 ! spiral around until matching mask is found.
@@ -1904,8 +1904,8 @@
           smcanl(len,lsoil),stcanl(len,lsoil),                         &
           slianl(len),scvanl(len),veganl(len),                         &
           vetanl(len),sotanl(len),socanl(len),alfanl(len,2)            &
-     ,    sihanl(len),sicanl(len)                                      &
-     ,    vmnanl(len),vmxanl(len),slpanl(len),absanl(len)
+     ,sihanl(len),sicanl(len)                                      &
+     ,vmnanl(len),vmxanl(len),slpanl(len),absanl(len)
       real (kind=kind_io8) tsfclm(len),tsfcl2(len),wetclm(len),         &
           snoclm(len),                                                 &
           zorclm(len),albclm(len,4),aisclm(len),                       &
@@ -1915,8 +1915,8 @@
           smcclm(len,lsoil),stcclm(len,lsoil),                         &
           sliclm(len),scvclm(len),vegclm(len),                         &
           vetclm(len),sotclm(len),socclm(len),alfclm(len,2)            &
-     ,    sihclm(len),sicclm(len)                                      &
-     ,    vmnclm(len),vmxclm(len),slpclm(len),absclm(len)
+     ,sihclm(len),sicclm(len)                                      &
+     ,vmnclm(len),vmxclm(len),slpclm(len),absclm(len)
       do i=1,len
         tsfanl(i)   = tsfclm(i)      !  tsf at t
         tsfan2(i)   = tsfcl2(i)      !  tsf at t-deltsfc
@@ -1959,7 +1959,7 @@
         enddo
       enddo
       return
-      end
+      end subroutine filanl
 
 !>\ingroup mod_sfcsub
       subroutine analy(lugb,iy,im,id,ih,fh,len,lsoil,slmskl,slmskw,     &
@@ -1979,9 +1979,9 @@
                       irttsf,irtwet,irtsno,irtzor,irtalb,irtais,       &
                       irttg3,irtscv,irtacn,irtsmc,irtstc,irtveg,       &
                       irtvet,irtsot,irtsoc,irtalf                      &
-     ,                irtvmn,irtvmx,irtslp,irtabs                      &
-     ,                imsk, jmsk, slmskh, outlat, outlon               &
-     ,                gaus, blno, blto, me, lanom)
+     ,irtvmn,irtvmx,irtslp,irtabs                      &
+     ,imsk, jmsk, slmskh, outlat, outlon               &
+     ,gaus, blno, blto, me, lanom)
       use machine , only : kind_io8,kind_io4
       implicit none
       logical  lanom
@@ -1990,7 +1990,7 @@
              imsk,jmsk,irtwet,lsoil,len,kpdtsf,kpdsno,kpdsnd,kpdwet,iy,& &
         lugb,im,ih,id,kpdveg,kpdstc,kprvet,irttsf,kpdsot,kpdsoc,kpdsmc,& &
              kpdais,kpdzor,kpdtg3,kpdacn,kpdscv,j                      &
-     ,       kpdvmn,kpdvmx,kpdslp,kpdabs,irtvmn,irtvmx,irtslp,irtabs
+     ,kpdvmn,kpdvmx,kpdslp,kpdabs,irtvmn,irtvmx,irtslp,irtabs
       real (kind=kind_io8) blto,blno,fh
       real (kind=kind_io8)    slmskl(len), slmskw(len)
       real (kind=kind_io8)    slmskh(imsk,jmsk)
@@ -2011,15 +2011,15 @@
           vetanl(len), sotanl(len),   socanl(len),alfanl(len,2),       &
           smcanl(len,lsoil), stcanl(len,lsoil),                        &
           tsfan0(len)                                                  &
-     ,    vmnanl(len),vmxanl(len),slpanl(len),absanl(len)
+     ,vmnanl(len),vmxanl(len),slpanl(len),absanl(len)
       logical gaus
 ! tsf
       irttsf = 1
       if(fntsfa(1:8).ne.'        ') then
         call fixrda(lugb,fntsfa,kpdtsf,slmskw, &
                    iy,im,id,ih,fh,tsfanl,len,iret &
-     ,             imsk, jmsk, slmskh, gaus,blno, blto &
-     ,             outlat, outlon, me)
+     ,imsk, jmsk, slmskh, gaus,blno, blto &
+     ,outlat, outlon, me)
         irttsf = iret
         if(iret == 1) then
           write(6,*) 'FATAL ERROR: t surface analysis read error.'
@@ -2027,7 +2027,7 @@
         elseif(iret == -1) then
           if (me == 0) then
             print *,'old t surface analysis provided, indicating proper' &
-     ,           ' file name is given.  no error suspected.'
+     ,' file name is given.  no error suspected.'
             write(6,*) 'forecast guess will be used'
           endif
         else
@@ -2048,8 +2048,8 @@
         do kk = 1, 4
           call fixrda(lugb,fnalba,kpdalb(kk),slmskl, &
                     iy,im,id,ih,fh,albanl(1,kk),len,iret &
-     ,              imsk, jmsk, slmskh, gaus,blno, blto &
-     ,              outlat, outlon, me)
+     ,imsk, jmsk, slmskh, gaus,blno, blto &
+     ,outlat, outlon, me)
           irtalb = iret
           if(iret == 1) then
             write(6,*) 'FATAL ERROR: albedo analysis read error.'
@@ -2076,8 +2076,8 @@
         do kk = 1, 2
           call fixrda(lugb,fnalba,kpdalf(kk),slmskl, &
                     iy,im,id,ih,fh,alfanl(1,kk),len,iret &
-     ,              imsk, jmsk, slmskh, gaus,blno, blto &
-     ,              outlat, outlon, me)
+     ,imsk, jmsk, slmskh, gaus,blno, blto &
+     ,outlat, outlon, me)
           irtalf = iret
           if(iret == 1) then
             write(6,*) 'FATAL ERROR: albedo analysis read error.'
@@ -2104,8 +2104,8 @@
       if(fnweta(1:8).ne.'        ') then
         call fixrda(lugb,fnweta,kpdwet,slmskl, &
                   iy,im,id,ih,fh,wetanl,len,iret &
-     ,            imsk, jmsk, slmskh, gaus,blno, blto &
-     ,            outlat, outlon, me)
+     ,imsk, jmsk, slmskh, gaus,blno, blto &
+     ,outlat, outlon, me)
         irtwet=iret
         if(iret.eq.1) then
           write(6,*) 'FATAL ERROR: bucket wetness analysis read error.'
@@ -2122,12 +2122,12 @@
       elseif(fnsmca(1:8).ne.'        ') then
         call fixrda(lugb,fnsmca,kpdsmc,slmskl, &
                   iy,im,id,ih,fh,smcanl(1,1),len,iret &
-     ,            imsk, jmsk, slmskh, gaus,blno, blto &
-     ,            outlat, outlon, me)
+     ,imsk, jmsk, slmskh, gaus,blno, blto &
+     ,outlat, outlon, me)
         call fixrda(lugb,fnsmca,kpdsmc,slmskl, &
                   iy,im,id,ih,fh,smcanl(1,2),len,iret &
-     ,            imsk, jmsk, slmskh, gaus,blno, blto &
-     ,            outlat, outlon, me)
+     ,imsk, jmsk, slmskh, gaus,blno, blto &
+     ,outlat, outlon, me)
         irtsmc=iret
         if(iret.eq.1) then
           write(6,*) 'FATAL ERROR: layer soil wetness analysis'
@@ -2185,15 +2185,15 @@
         if (kgds(1) == 4) then  ! gaussian data is depth
           call fixrda(lugb,fnsnoa,kpdsnd,slmskl, &
                      iy,im,id,ih,fh,snoanl,len,iret &
-     ,               imsk, jmsk, slmskh, gaus,blno, blto &
-     ,               outlat, outlon, me)
+     ,imsk, jmsk, slmskh, gaus,blno, blto &
+     ,outlat, outlon, me)
           snoanl = snoanl*100.  ! convert from meters to liq. eq.
                                 ! depth in mm using 10:1 ratio
         else                    ! lat/lon data is liq equv. depth
           call fixrda(lugb,fnsnoa,kpdsno,slmskl, &
                      iy,im,id,ih,fh,snoanl,len,iret &
-     ,               imsk, jmsk, slmskh, gaus,blno, blto &
-     ,               outlat, outlon, me)
+     ,imsk, jmsk, slmskh, gaus,blno, blto &
+     ,outlat, outlon, me)
         endif
         irtscv=iret
         if(iret.eq.1) then
@@ -2215,8 +2215,8 @@
         enddo
         call fixrda(lugb,fnscva,kpdscv,slmskl, &
                   iy,im,id,ih,fh,scvanl,len,iret &
-     ,            imsk, jmsk, slmskh, gaus,blno, blto &
-     ,            outlat, outlon, me)
+     ,imsk, jmsk, slmskh, gaus,blno, blto &
+     ,outlat, outlon, me)
         irtsno=iret
         if(iret.eq.1) then
           write(6,*) 'FATAL ERROR: snow cover analysis read error.'
@@ -2241,8 +2241,8 @@
       if(fnacna(1:8).ne.'        ') then
         call fixrda(lugb,fnacna,kpdacn,slmskw, &
                   iy,im,id,ih,fh,acnanl,len,iret &
-     ,            imsk, jmsk, slmskh, gaus,blno, blto &
-     ,            outlat, outlon, me)
+     ,imsk, jmsk, slmskh, gaus,blno, blto &
+     ,outlat, outlon, me)
         irtacn=iret
         if(iret.eq.1) then
           write(6,*) 'FATAL ERROR: ice concentration'
@@ -2261,8 +2261,8 @@
       elseif(fnaisa(1:8).ne.'        ') then
         call fixrda(lugb,fnaisa,kpdais,slmskw, &
                   iy,im,id,ih,fh,aisanl,len,iret &
-     ,            imsk, jmsk, slmskh, gaus,blno, blto &
-     ,            outlat, outlon, me)
+     ,imsk, jmsk, slmskh, gaus,blno, blto &
+     ,outlat, outlon, me)
         irtais=iret
         if(iret.eq.1) then
           write(6,*) 'FATAL ERROR: ice mask analysis read error.'
@@ -2286,8 +2286,8 @@
       if(fnzora(1:8).ne.'        ') then
         call fixrda(lugb,fnzora,kpdzor,slmskl, &
                   iy,im,id,ih,fh,zoranl,len,iret &
-     ,            imsk, jmsk, slmskh, gaus,blno, blto &
-     ,            outlat, outlon, me)
+     ,imsk, jmsk, slmskh, gaus,blno, blto &
+     ,outlat, outlon, me)
         irtzor=iret
         if(iret.eq.1) then
           write(6,*) 'FATAL ERROR: roughness analysis read error.'
@@ -2312,8 +2312,8 @@
       if(fntg3a(1:8).ne.'        ') then
         call fixrda(lugb,fntg3a,kpdtg3,slmskl, &
                   iy,im,id,ih,fh,tg3anl,len,iret &
-     ,            imsk, jmsk, slmskh, gaus,blno, blto &
-     ,            outlat, outlon, me)
+     ,imsk, jmsk, slmskh, gaus,blno, blto &
+     ,outlat, outlon, me)
         irttg3=iret
         if(iret.eq.1) then
           write(6,*) 'FATAL ERROR: deep soil tmp analysis read error.'
@@ -2331,12 +2331,12 @@
       elseif(fnstca(1:8).ne.'        ') then
         call fixrda(lugb,fnstca,kpdstc,slmskl, &
                   iy,im,id,ih,fh,stcanl(1,1),len,iret &
-     ,            imsk, jmsk, slmskh, gaus,blno, blto &
-     ,            outlat, outlon, me)
+     ,imsk, jmsk, slmskh, gaus,blno, blto &
+     ,outlat, outlon, me)
         call fixrda(lugb,fnstca,kpdstc,slmskl, &
                   iy,im,id,ih,fh,stcanl(1,2),len,iret &
-     ,            imsk, jmsk, slmskh, gaus,blno, blto &
-     ,            outlat, outlon, me)
+     ,imsk, jmsk, slmskh, gaus,blno, blto &
+     ,outlat, outlon, me)
         irtstc=iret
         if(iret.eq.1) then
           write(6,*) 'FATAL ERROR: layer soil tmp analysis read error.'
@@ -2361,8 +2361,8 @@
       if(fnvega(1:8).ne.'        ') then
         call fixrda(lugb,fnvega,kpdveg,slmskl, &
                   iy,im,id,ih,fh,veganl,len,iret &
-     ,            imsk, jmsk, slmskh, gaus,blno, blto &
-     ,            outlat, outlon, me)
+     ,imsk, jmsk, slmskh, gaus,blno, blto &
+     ,outlat, outlon, me)
         irtveg=iret
         if(iret.eq.1) then
           write(6,*) 'FATAL ERROR: vegetation cover analysis'
@@ -2388,8 +2388,8 @@
       if(fnveta(1:8).ne.'        ') then
         call fixrda(lugb,fnveta,kpdvet,slmskl, &
                   iy,im,id,ih,fh,vetanl,len,iret &
-     ,            imsk, jmsk, slmskh, gaus,blno, blto &
-     ,            outlat, outlon, me)
+     ,imsk, jmsk, slmskh, gaus,blno, blto &
+     ,outlat, outlon, me)
         irtvet=iret
         if(iret.eq.1) then
           write(6,*) 'FATAL ERROR: vegetation type analysis'
@@ -2415,8 +2415,8 @@
       if(fnsota(1:8).ne.'        ') then
         call fixrda(lugb,fnsota,kpdsot,slmskl, &
                   iy,im,id,ih,fh,sotanl,len,iret &
-     ,            imsk, jmsk, slmskh, gaus,blno, blto &
-     ,            outlat, outlon, me)
+     ,imsk, jmsk, slmskh, gaus,blno, blto &
+     ,outlat, outlon, me)
         irtsot=iret
         if(iret.eq.1) then
           write(6,*) 'FATAL ERROR: soil type analysis read error.'
@@ -2442,8 +2442,8 @@
       if(fnsoca(1:8).ne.'        ') then
         call fixrda(lugb,fnsoca,kpdsoc,slmskl, &
                   iy,im,id,ih,fh,socanl,len,iret &
-     ,            imsk, jmsk, slmskh, gaus,blno, blto &
-     ,            outlat, outlon, me)
+     ,imsk, jmsk, slmskh, gaus,blno, blto &
+     ,outlat, outlon, me)
         irtsoc=iret
         if(iret.eq.1) then
           write(6,*) 'FATAL ERROR: soil color analysis read error.'
@@ -2469,8 +2469,8 @@
       if(fnvmna(1:8).ne.'        ') then
         call fixrda(lugb,fnvmna,kpdvmn,slmskl, &
                   iy,im,id,ih,fh,vmnanl,len,iret &
-     ,            imsk, jmsk, slmskh, gaus,blno, blto &
-     ,            outlat, outlon, me)
+     ,imsk, jmsk, slmskh, gaus,blno, blto &
+     ,outlat, outlon, me)
         irtvmn=iret
         if(iret.eq.1) then
           write(6,*) 'FATAL ERROR: shdmin analysis read error.'
@@ -2496,8 +2496,8 @@
       if(fnvmxa(1:8).ne.'        ') then
         call fixrda(lugb,fnvmxa,kpdvmx,slmskl, &
                   iy,im,id,ih,fh,vmxanl,len,iret &
-     ,            imsk, jmsk, slmskh, gaus,blno, blto &
-     ,            outlat, outlon, me)
+     ,imsk, jmsk, slmskh, gaus,blno, blto &
+     ,outlat, outlon, me)
         irtvmx=iret
         if(iret.eq.1) then
           write(6,*) 'FATAL ERROR: shdmax analysis read error.'
@@ -2523,8 +2523,8 @@
       if(fnslpa(1:8).ne.'        ') then
         call fixrda(lugb,fnslpa,kpdslp,slmskl, &
                   iy,im,id,ih,fh,slpanl,len,iret &
-     ,            imsk, jmsk, slmskh, gaus,blno, blto &
-     ,            outlat, outlon, me)
+     ,imsk, jmsk, slmskh, gaus,blno, blto &
+     ,outlat, outlon, me)
         irtslp=iret
         if(iret.eq.1) then
           write(6,*) 'FATAL ERROR: slope type analysis read error.'
@@ -2550,8 +2550,8 @@
       if(fnabsa(1:8).ne.'        ') then
         call fixrda(lugb,fnabsa,kpdabs,slmskl, &
                   iy,im,id,ih,fh,absanl,len,iret &
-     ,            imsk, jmsk, slmskh, gaus,blno, blto &
-     ,            outlat, outlon, me)
+     ,imsk, jmsk, slmskh, gaus,blno, blto &
+     ,outlat, outlon, me)
         irtabs=iret
         if(iret.eq.1) then
           write(6,*) 'FATAL ERROR: snoalb analysis read error.'
@@ -2573,7 +2573,7 @@
       endif
 
       return
-      end
+      end subroutine analy
 
 !>\ingroup mod_sfcsub
       subroutine filfcs(tsffcs,wetfcs,snofcs,zorfcs,albfcs,             &
@@ -2600,8 +2600,8 @@
           smcfcs(len,lsoil),stcfcs(len,lsoil),                         &
           slifcs(len),vegfcs(len),                                     &
           vetfcs(len),sotfcs(len),socfcs(len),alffcs(len,2)            &
-     ,    sihfcs(len),sicfcs(len)                                      &
-     ,    vmnfcs(len),vmxfcs(len),slpfcs(len),absfcs(len)
+     ,sihfcs(len),sicfcs(len)                                      &
+     ,vmnfcs(len),vmxfcs(len),slpfcs(len),absfcs(len)
       real (kind=kind_io8) tsfanl(len),wetanl(len),snoanl(len),         &
           zoranl(len),albanl(len,4),aisanl(len),                       &
           tg3anl(len),                                                 &
@@ -2610,8 +2610,8 @@
           smcanl(len,lsoil),stcanl(len,lsoil),                         &
           slianl(len),veganl(len),                                     &
           vetanl(len),sotanl(len),socanl(len),alfanl(len,2)            &
-     ,    sihanl(len),sicanl(len)                                      &
-     ,    vmnanl(len),vmxanl(len),slpanl(len),absanl(len)
+     ,sihanl(len),sicanl(len)                                      &
+     ,vmnanl(len),vmxanl(len),slpanl(len),absanl(len)
       write(6,*) '  this is a dead start run, tsfc over land is',       &
                 ' set as lowest sigma level temperture if given.'
       write(6,*) '  if not, set to climatological tsf over land is used'
@@ -2651,7 +2651,7 @@
         enddo
       enddo
       return
-      end
+      end subroutine filfcs
 
 !>\ingroup mod_sfcsub
       subroutine rof01(aisfld, len, op, crit)
@@ -2698,7 +2698,7 @@
         call abort
       endif
       return
-      end
+      end subroutine rof01
 
 !>\ingroup mod_sfcsub
       subroutine rof01_len(aisfld, len, op, crit)
@@ -2746,7 +2746,7 @@
         call abort
       endif
       return
-      end
+      end subroutine rof01_len
 !>\ingroup mod_sfcsub
       subroutine tsfcor(tsfc,orog,slmask,umask,len,rlapse)
       use machine , only : kind_io8,kind_io4
@@ -2760,7 +2760,7 @@
         endif
       enddo
       return
-      end
+      end subroutine tsfcor
 
 !>\ingroup mod_sfcsub
 !! This subroutine uses surface temperature to get snow depth estimate.
@@ -2838,7 +2838,7 @@
       integer k,i,im,id,iy,len,lsoil,ih,irtacn,irtsmc,irtscv,irtais,    &
           irttg3,irtstc,irtalf,me,irtsot,irtsoc,irtveg,irtvet, irtzor, &
              irtalb,irtsno,irttsf,irtwet,j                             &
-     ,       irtvmn,irtvmx,irtslp,irtabs
+     ,irtvmn,irtvmx,irtslp,irtabs
       logical, intent(in)  :: landice
       real (kind=kind_io8) rvegs,rvets,rzors,raiss,rsnos,rsots,rsocs,   &
                           rcnp,rcvt,rcv,rcvb,rsnol,rzorl,raisl,ralbl,  &
@@ -2854,10 +2854,10 @@
                           csihl,csihs,csicl,csics,                     &
                           rsihl,rsihs,rsicl,rsics,                     &
                           qsihl,qsihs,qsicl,qsics                      &
-     ,                    cvmnl,cvmns,cvmxl,cvmxs,cslpl,cslps          &
-     ,                    cabsl,cabss,rvmnl,rvmns,rvmxl,rvmxs          &
-     ,                    rslpl,rslps,rabsl,rabss,qvmnl,qvmns          &
-     ,                    qvmxl,qvmxs,qslpl,qslps,qabsl,qabss
+     ,cvmnl,cvmns,cvmxl,cvmxs,cslpl,cslps          &
+     ,cabsl,cabss,rvmnl,rvmns,rvmxl,rvmxs          &
+     ,rslpl,rslps,rabsl,rabss,qvmnl,qvmns          &
+     ,qvmxl,qvmxs,qslpl,qslps,qabsl,qabss
       real (kind=kind_io8) slmskl(len), slmskw(len)
       real (kind=kind_io8) tsffcs(len), wetfcs(len),   snofcs(len),     &
           zorfcs(len), albfcs(len,4), aisfcs(len),                     &
@@ -2866,8 +2866,8 @@
           smcfcs(len,lsoil),stcfcs(len,lsoil),                         &
           slifcs(len), vegfcs(len),                                    &
           vetfcs(len), sotfcs(len),socfcs(len),   alffcs(len,2)        &
-     ,    sihfcs(len), sicfcs(len)                                     &
-     ,    vmnfcs(len),vmxfcs(len),slpfcs(len),absfcs(len)
+     ,sihfcs(len), sicfcs(len)                                     &
+     ,vmnfcs(len),vmxfcs(len),slpfcs(len),absfcs(len)
       real (kind=kind_io8) tsfanl(len),tsfan2(len),                     &
           wetanl(len),snoanl(len),                                     &
           zoranl(len), albanl(len,4), aisanl(len),                     &
@@ -2876,8 +2876,8 @@
           smcanl(len,lsoil),stcanl(len,lsoil),                         &
           slianl(len), veganl(len),                                    &
           vetanl(len), sotanl(len),socanl(len), alfanl(len,2)          &
-     ,    sihanl(len),sicanl(len)                                      &
-     ,    vmnanl(len),vmxanl(len),slpanl(len),absanl(len)
+     ,sihanl(len),sicanl(len)                                      &
+     ,vmnanl(len),vmxanl(len),slpanl(len),absanl(len)
       real (kind=kind_io8) csmcl(lsoil), csmcs(lsoil),                  &
                           cstcl(lsoil), cstcs(lsoil)
       real (kind=kind_io8) rsmcl(lsoil), rsmcs(lsoil),                  &
@@ -3217,7 +3217,7 @@
       real (kind=kind_io8), parameter :: one=1.0
       real (kind=kind_io8) tgice,albice,zorice,tsfice,albsea,snosea,    &
                           smcice,tsfmin,zorsea,smcsea &
-     ,                    sicnew,sihnew   
+     ,sicnew,sihnew   
       integer i,me,kount1,kount2,k,len,lsoil
       real (kind=kind_io8) slianl(len),   slifcs(len), &
                           tsffcs(len),tsfanl(len)
@@ -3283,7 +3283,7 @@
         endif
       endif
       return
-      end
+      end subroutine newice
 
 !>\ingroup mod_sfcsub
       subroutine qcsnow(snoanl,slmask,aisanl,glacir,len,snoval,         &
@@ -3379,7 +3379,7 @@
         endif
       endif
       return
-      end
+      end subroutine qcsice
 
 !>\ingroup mod_sfcsub
       subroutine setlsi(slmask,aisfld,len,aicice,slifld)
@@ -3395,7 +3395,7 @@
                                     slifld(i) = 2.0
       enddo
       return
-      end
+      end subroutine setlsi
 !>\ingroup mod_sfcsub
       subroutine scale(fld,len,scl)
       use machine , only : kind_io8,kind_io4
@@ -3406,7 +3406,7 @@
         fld(i) = fld(i) * scl
       enddo
       return
-      end
+      end subroutine scale
 
 
 !>\ingroup mod_sfcsub
@@ -3422,7 +3422,7 @@
                           blto
 !  interpolation from lat/lon grid to other lat/lon grid
       real (kind=kind_io8) gauin (imxin,jmxin), regout(imxout,jmxout)   &
-     ,                    rlnout(imxout), rltout(jmxout)
+     ,rlnout(imxout), rltout(jmxout)
       logical gaus
       real, allocatable :: gaul(:)
       real (kind=kind_io8) ddx(imxout),ddy(jmxout)
@@ -3607,7 +3607,7 @@
         endif
       endif
       return
-      end
+      end subroutine ga2la
 
 !>\ingroup mod_sfcsub
       subroutine landtyp(vegtype,soiltype,colortype,slptype,slmask,len)
@@ -3615,7 +3615,7 @@
       implicit none
       integer i,len
       real (kind=kind_io8) vegtype(len),soiltype(len),slmask(len)       &
-     ,                    slptype(len),colortype(len)  
+     ,slptype(len),colortype(len)  
 !  make sure that the soil type and veg type are non-zero over land
       do i = 1, len
         if (slmask(i) .eq. 1) then
@@ -3639,7 +3639,7 @@
         if(abs(fld(i)).lt.eps) fld(i) = 0.
       enddo
       return
-      end
+      end subroutine setzro
 
 !>\ingroup mod_sfcsub
       subroutine getscv(snofld,scvfld,len)
@@ -3652,7 +3652,7 @@
         if(snofld(i).gt.0.) scvfld(i) = 1.
       enddo
       return
-      end
+      end subroutine getscv
 
 !>\ingroup mod_sfcsub
       subroutine getstc(tsffld,tg3fld,slifld,len,lsoil,stcfld,tsfimx)
@@ -3684,7 +3684,7 @@
         enddo
       endif
       return
-      end
+      end subroutine getstc
 
 !>\ingroup mod_sfcsub
 !! This subroutine calculates layer soil wetness.
@@ -3701,7 +3701,7 @@
         enddo
       enddo
       return
-      end
+      end subroutine getsmc
 
 !>\ingroup mod_sfcsub
       subroutine snosfc(snoanl,tsfanl,tsfsmx,len,me)
@@ -3726,7 +3726,7 @@
         endif
       endif
       return
-      end
+      end subroutine snosfc
 
 !>\ingroup mod_sfcsub
       subroutine albocn(albclm,slmask,albomx,len)
@@ -3744,7 +3744,7 @@
         endif
       enddo
       return
-      end
+      end subroutine albocn
 
 !>\ingroup mod_sfcsub
       subroutine qcmxice(glacir,amxice,len,me)
@@ -3763,10 +3763,10 @@
       if(kount.gt.0) then
         per = float(kount) / float(len)*100.
         if(me .eq. 0) write(6,*) ' max ice limit less than glacier' &
-     ,            ' coverage at ', kount, ' points ',per,'percent'
+     ,' coverage at ', kount, ' points ',per,'percent'
       endif
       return
-      end
+      end subroutine qcmxice
 
 !>\ingroup mod_sfcsub
       subroutine qcsli(slianl,slifcs,len,me)
@@ -3806,7 +3806,7 @@
         endif
       endif
       return
-      end
+      end subroutine qcsli
 
 !>\ingroup mod_sfcsub
       subroutine qcbyfc(tsffcs,snofcs,qctsfs,qcsnos,qctsfi,             &
@@ -3862,12 +3862,12 @@
         endif
       endif
       return
-      end
+      end subroutine qcbyfc
 
 !>\ingroup mod_sfcsub
       subroutine setrmsk(kpds5,slmask,igaul,jgaul,wlon,rnlat,           &
                         data,imax,jmax,rlnout,rltout,lmask,rslmsk      &
-     ,                  gaus,blno, blto, kgds1, kpds4, lbms)
+     ,gaus,blno, blto, kgds1, kpds4, lbms)
       use machine , only : kind_io8,kind_io4,kind_dbl_prec
       implicit none
       real (kind=kind_io8) blno,blto,wlon,rnlat,crit,data_max
@@ -3878,7 +3878,7 @@
 
       real (kind=kind_io8)    slmask(igaul,jgaul)
       real (kind=kind_io8)    data(imax,jmax),rslmsk(imax,jmax) &
-     ,                       rlnout(imax), rltout(jmax)
+     ,rlnout(imax), rltout(jmax)
       real (kind=kind_io8)    radi, dlat, dlon
       real (kind=kind_dbl_prec) a(jmax), w(jmax)
       logical lmask, gaus
@@ -3923,14 +3923,14 @@
 !  surface temperature
         lmask = .false.
         call ga2la(slmask,igaul,jgaul,rslmsk,imax,jmax,wlon,rnlat &
-     ,            rlnout, rltout, gaus, blno, blto)
+     ,rlnout, rltout, gaus, blno, blto)
         crit = 0.5
         call rof01(rslmsk,ijmax,'ge',crit)
         lmask = .true.
 !  bucket soil wetness
       elseif(kpds5.eq.kpdwet) then
         call ga2la(slmask,igaul,jgaul,rslmsk,imax,jmax,wlon,rnlat &
-     ,            rlnout, rltout, gaus, blno, blto)
+     ,rlnout, rltout, gaus, blno, blto)
         crit = 0.5
         call rof01(rslmsk,ijmax,'ge',crit)
         lmask = .true.
@@ -3952,7 +3952,7 @@
 ! snow liq equivalent depth
       elseif(kpds5.eq.kpdsno) then
         call ga2la(slmask,igaul,jgaul,rslmsk,imax,jmax,wlon,rnlat &
-     ,            rlnout, rltout, gaus, blno, blto)
+     ,rlnout, rltout, gaus, blno, blto)
         crit=0.5
         call rof01(rslmsk,ijmax,'ge',crit)
         lmask=.true.
@@ -3970,7 +3970,7 @@
           lmask=.true.
         else
           call ga2la(slmask,igaul,jgaul,rslmsk,imax,jmax,wlon,rnlat &
-     ,            rlnout, rltout, gaus, blno, blto)
+     ,rlnout, rltout, gaus, blno, blto)
           crit=0.5
           call rof01(rslmsk,ijmax,'ge',crit)
           lmask=.true.
@@ -4080,7 +4080,7 @@
 !  snow cover
       elseif(kpds5.eq.kpdscv) then
         call ga2la(slmask,igaul,jgaul,rslmsk,imax,jmax,wlon,rnlat &
-     ,            rlnout, rltout, gaus, blno, blto)
+     ,rlnout, rltout, gaus, blno, blto)
         crit=0.5
         call rof01(rslmsk,ijmax,'ge',crit)
         lmask=.true.
@@ -4088,7 +4088,7 @@
       elseif(kpds5.eq.kpdacn) then
         lmask=.false.
         call ga2la(slmask,igaul,jgaul,rslmsk,imax,jmax,wlon,rnlat &
-     ,            rlnout, rltout, gaus, blno, blto)
+     ,rlnout, rltout, gaus, blno, blto)
         crit=0.5
         call rof01(rslmsk,ijmax,'ge',crit)
         lmask=.true.
@@ -4108,7 +4108,7 @@
         else  ! no bitmap, set mask the old way.
 
           call ga2la(slmask,igaul,jgaul,rslmsk,imax,jmax,wlon,rnlat &
-     ,              rlnout, rltout, gaus, blno, blto)
+     ,rlnout, rltout, gaus, blno, blto)
           crit=0.5
           call rof01(rslmsk,ijmax,'ge',crit)
           lmask=.true.
@@ -4215,7 +4215,7 @@
         end if
       endif
       return
-      end
+      end subroutine setrmsk
 
 !>\ingroup mod_sfcsub
       subroutine clima(lugb,iy,im,id,ih,fh,len,lsoil,slmskl,slmskw,     &
@@ -4233,9 +4233,9 @@
                       kpdvet,kpdsot,kpdsoc,kpdalf,tsfcl0,              &
                       kpdvmn,kpdvmx,kpdslp,kpdabs,                     &
                       deltsfc, lanom                                   &
-     ,                imsk, jmsk, slmskh, outlat, outlon               &
-     ,                gaus, blno, blto, me,lprnt,iprnt, fnalbc2, ialb  &
-     ,                tile_num_ch, i_index, j_index)
+     ,imsk, jmsk, slmskh, outlat, outlon               &
+     ,gaus, blno, blto, me,lprnt,iprnt, fnalbc2, ialb  &
+     ,tile_num_ch, i_index, j_index)
       use machine , only : kind_io8,kind_io4, kind_dbl_prec
       implicit none
       character(len=*), intent(in) :: tile_num_ch
@@ -4248,12 +4248,12 @@
              kpdzor,kpdtsf,kpdwet,kpdscv,kpdacn,kpdais,kpdtg3,im,id,   &
              lugb,iy,len,lsoil,ih,kpdsmc,iprnt,me,m1,m2,k1,k2,         &
              kpdvet,kpdsot,kpdsoc,kpdstc,kpdveg,jmsk,imsk,j,ialb       &
-     ,       kpdvmn,kpdvmx,kpdslp,kpdabs,landice_cat
+     ,kpdvmn,kpdvmx,kpdslp,kpdabs,landice_cat
       integer kpdalb(4), kpdalf(2)
       character*500 fntsfc,fnwetc,fnsnoc,fnzorc,fnalbc,fnaisc,          &
                   fntg3c,fnscvc,fnsmcc,fnstcc,fnacnc,fnvegc,           &
                   fnvetc,fnsotc,fnsocc,fnalbc2                         &
-     ,            fnvmnc,fnvmxc,fnslpc,fnabsc
+     ,fnvmnc,fnvmxc,fnslpc,fnabsc
       real (kind=kind_io8) tsfclm(len),tsfcl2(len),                     &
           wetclm(len),snoclm(len),                                     &
           zorclm(len),albclm(len,4),aisclm(len),                       &
@@ -4263,7 +4263,7 @@
           smcclm(len,lsoil),stcclm(len,lsoil),                         &
           sliclm(len),scvclm(len),vegclm(len),                         &
           vetclm(len),sotclm(len),socclm(len),alfclm(len,2)            &
-     ,    vmnclm(len),vmxclm(len),slpclm(len),absclm(len)
+     ,vmnclm(len),vmxclm(len),slpclm(len),absclm(len)
       real (kind=kind_io8) slmskh(imsk,jmsk)
       real (kind=kind_io8) outlat(len), outlon(len)
       real (kind=kind_io8) slmskl(len), slmskw(len), tsfcl0(len)
@@ -4297,7 +4297,7 @@
                           tg3(:),   alb(:,:,:), alf(:,:), &
                           vet(:),   sot(:), soc(:),    tsf2(:),          &
                           veg(:,:), stc(:,:,:) &
-     ,                    vmn(:), vmx(:),  slp(:), absm(:)
+     ,vmn(:), vmx(:),  slp(:), absm(:)
       integer mon1s, mon2s, sea1s, sea2s, sea1, sea2, hyr1, hyr2
       data first/.true./
       data mon1s/0/, mon2s/0/, sea1s/0/, sea2s/0/
@@ -4408,8 +4408,8 @@
             if (nn == 2) mon = mon2
             call fixrdc(lugb,fntsfc,kpdtsf,kpd7,mon,slmskw, &
                       tsf(1,nn),len,iret &
-     ,                imsk, jmsk, slmskh, gaus,blno, blto &
-     ,                outlat, outlon, me)
+     ,imsk, jmsk, slmskh, gaus,blno, blto &
+     ,outlat, outlon, me)
           enddo
 !  tsf at the begining of forecast i.e. fh=0
           do i=1,len
@@ -4521,18 +4521,18 @@
         if (ialb == 1 .or. ialb == 2) then
           if ( index(fnalbc2, "tileX.nc") == 0) then ! grib file
             call fixrdc(lugb,fnalbc2,kpdalf(1),kpd7,kpd9,slmskl &
-     ,                 alf,len,iret &
-     ,                 imsk, jmsk, slmskh, gaus,blno, blto &
-     ,                 outlat, outlon, me)
+     ,alf,len,iret &
+     ,imsk, jmsk, slmskh, gaus,blno, blto &
+     ,outlat, outlon, me)
           else
             call fixrdc_tile(fnalbc2, tile_num_ch, i_index, j_index, &
                             kpdalf(1), alf(:,1), 1, len, me)
           endif
         else
           call fixrdc(lugb,fnalbc,kpdalf(1),kpd7,kpd9,slmskl &
-     ,               alf,len,iret &
-     ,               imsk, jmsk, slmskh, gaus,blno, blto &
-     ,               outlat, outlon, me)
+     ,alf,len,iret &
+     ,imsk, jmsk, slmskh, gaus,blno, blto &
+     ,outlat, outlon, me)
         endif
         do i = 1, len
           if(slmskl(i) == 1.) then
@@ -4545,8 +4545,8 @@
             kpd7=-1
             call fixrdc(lugb,fntg3c,kpdtg3,kpd7,kpd9,slmskl, &
                        tg3,len,iret &
-     ,                 imsk, jmsk, slmskh, gaus,blno, blto &
-     ,                 outlat, outlon, me)
+     ,imsk, jmsk, slmskh, gaus,blno, blto &
+     ,outlat, outlon, me)
           else
             call fixrdc_tile(fntg3c, tile_num_ch, i_index, j_index, &
                             kpdtg3, tg3, 1, len, me)
@@ -4560,8 +4560,8 @@
             kpd7=-1
             call fixrdc(lugb,fnvetc,kpdvet,kpd7,kpd9,slmskl, &
                        vet,len,iret &
-     ,                 imsk, jmsk, slmskh, gaus,blno, blto &
-     ,                 outlat, outlon, me)
+     ,imsk, jmsk, slmskh, gaus,blno, blto &
+     ,outlat, outlon, me)
             landice_cat=13
             if (maxval(vet)> 13.0) landice_cat=15
           else  
@@ -4584,8 +4584,8 @@
             kpd7=-1
             call fixrdc(lugb,fnsotc,kpdsot,kpd7,kpd9,slmskl, &
                        sot,len,iret &
-     ,                 imsk, jmsk, slmskh, gaus,blno, blto &
-     ,                 outlat, outlon, me)
+     ,imsk, jmsk, slmskh, gaus,blno, blto &
+     ,outlat, outlon, me)
           else
             call fixrdc_tile(fnsotc, tile_num_ch, i_index, j_index, &
                             kpdsot, sot, 1, len, me)
@@ -4599,8 +4599,8 @@
             kpd7=-1
             call fixrdc(lugb,fnsocc,kpdsoc,kpd7,kpd9,slmskl, &
                        soc,len,iret &
-     ,                 imsk, jmsk, slmskh, gaus,blno, blto &
-     ,                 outlat, outlon, me)
+     ,imsk, jmsk, slmskh, gaus,blno, blto &
+     ,outlat, outlon, me)
           else
             call fixrdc_tile(fnsocc, tile_num_ch, i_index, j_index, &
                             255, soc, 1, len, me)
@@ -4615,8 +4615,8 @@
             kpd7=-1
             call fixrdc(lugb,fnvmnc,kpdvmn,kpd7,kpd9,slmskl, &
                        vmn,len,iret &
-     ,                 imsk, jmsk, slmskh, gaus,blno, blto &
-     ,                 outlat, outlon, me)
+     ,imsk, jmsk, slmskh, gaus,blno, blto &
+     ,outlat, outlon, me)
           else
             call fixrdc_tile(fnvmnc, tile_num_ch, i_index, j_index, &
                             257, vmn, 99, len, me)
@@ -4630,8 +4630,8 @@
             kpd7=-1
             call fixrdc(lugb,fnvmxc,kpdvmx,kpd7,kpd9,slmskl, &
                        vmx,len,iret &
-     ,                 imsk, jmsk, slmskh, gaus,blno, blto &
-     ,                 outlat, outlon, me)
+     ,imsk, jmsk, slmskh, gaus,blno, blto &
+     ,outlat, outlon, me)
           else
             call fixrdc_tile(fnvmxc, tile_num_ch, i_index, j_index, &
                             256, vmx, 99, len, me)
@@ -4644,8 +4644,8 @@
             kpd7=-1
             call fixrdc(lugb,fnslpc,kpdslp,kpd7,kpd9,slmskl, &
                        slp,len,iret &
-     ,                 imsk, jmsk, slmskh, gaus,blno, blto &
-     ,                 outlat, outlon, me)
+     ,imsk, jmsk, slmskh, gaus,blno, blto &
+     ,outlat, outlon, me)
           else
             call fixrdc_tile(fnslpc, tile_num_ch, i_index, j_index, &
                             kpdslp, slp, 1, len, me)
@@ -4658,8 +4658,8 @@
             kpd7=-1
             call fixrdc(lugb,fnabsc,kpdabs,kpd7,kpd9,slmskl, &
                        absm,len,iret &
-     ,                 imsk, jmsk, slmskh, gaus,blno, blto &
-     ,                 outlat, outlon, me)
+     ,imsk, jmsk, slmskh, gaus,blno, blto &
+     ,outlat, outlon, me)
           else
             call fixrdc_tile(fnabsc, tile_num_ch, i_index, j_index, &
                             kpdabs, absm, 1, len, me)
@@ -4691,8 +4691,8 @@
             do k = 1, 4
               call fixrdc(lugb,fnalbc,kpdalb(k),kpd7,kpd9,slmskl, &
                          alb(1,k,nn),len,iret &
-     ,                   imsk, jmsk, slmskh, gaus,blno, blto &
-     ,                   outlat, outlon, me)
+     ,imsk, jmsk, slmskh, gaus,blno, blto &
+     ,outlat, outlon, me)
             enddo
           endif
 !         monthly mean climatology
@@ -4704,8 +4704,8 @@
               do k = 1, 4
                 call fixrdc(lugb,fnalbc,kpdalb(k),kpd7,mon,slmskl, &
                            alb(1,k,nn),len,iret &
-     ,                     imsk, jmsk, slmskh, gaus,blno, blto &
-     ,                     outlat, outlon, me)
+     ,imsk, jmsk, slmskh, gaus,blno, blto &
+     ,outlat, outlon, me)
               enddo
             else
               do k = 1, 4
@@ -4719,23 +4719,23 @@
           kpd7=-1
           call fixrdc(lugb,fntsfc,kpdtsf,kpd7,mon,slmskw, &
                     tsf(1,nn),len,iret &
-     ,              imsk, jmsk, slmskh, gaus,blno, blto &
-     ,              outlat, outlon, me)
+     ,imsk, jmsk, slmskh, gaus,blno, blto &
+     ,outlat, outlon, me)
 !  tsf...at time t-deltsfc
 !  soil wetness
           if(fnwetc(1:8).ne.'        ') then
             kpd7=-1
             call fixrdc(lugb,fnwetc,kpdwet,kpd7,mon,slmskl, &
                        wet(1,nn),len,iret &
-     ,                 imsk, jmsk, slmskh, gaus,blno, blto &
-     ,                 outlat, outlon, me)
+     ,imsk, jmsk, slmskh, gaus,blno, blto &
+     ,outlat, outlon, me)
           elseif(fnsmcc(1:8).ne.'        ') then
             if (index(fnsmcc,'global_soilmcpc.1x1.grb') /= 0) then ! the old climo data
               kpd7=-1
               call fixrdc(lugb,fnsmcc,kpdsmc,kpd7,mon,slmskl, &
                          smc(1,lsoil,nn),len,iret &
-     ,                   imsk, jmsk, slmskh, gaus,blno, blto &
-     ,                   outlat, outlon, me)
+     ,imsk, jmsk, slmskh, gaus,blno, blto &
+     ,outlat, outlon, me)
               do l=1,lsoil-1
                 do i = 1, len
                  smc(i,l,nn) = smc(i,lsoil,nn)
@@ -4759,8 +4759,8 @@
                 if (k==4) kpd7=25800  ! 100_200 cm
                 call fixrdc(lugb,fnsmcc,kpdsmc,kpd7,mon,slmask_noice, &
                            smc(1,k,nn),len,iret &
-     ,                     imsk, jmsk, slmskh, gaus,blno, blto &
-     ,                     outlat, outlon, me)
+     ,imsk, jmsk, slmskh, gaus,blno, blto &
+     ,outlat, outlon, me)
               enddo
               deallocate(slmask_noice)
             endif
@@ -4774,8 +4774,8 @@
             kpd7=-1
             call fixrdc(lugb,fnstcc,kpdstc,kpd7,mon,slmskl, &
                        stc(1,lsoil,nn),len,iret &
-     ,                 imsk, jmsk, slmskh, gaus,blno, blto &
-     ,                 outlat, outlon, me)
+     ,imsk, jmsk, slmskh, gaus,blno, blto &
+     ,outlat, outlon, me)
             do l=1,lsoil-1
               do i = 1, len
                stc(i,l,nn) = stc(i,lsoil,nn)
@@ -4787,13 +4787,13 @@
           if(fnacnc(1:8).ne.'        ') then
             call fixrdc(lugb,fnacnc,kpdacn,kpd7,mon,slmskw, &
                        acn(1,nn),len,iret &
-     ,                 imsk, jmsk, slmskh, gaus,blno, blto &
-     ,                 outlat, outlon, me)
+     ,imsk, jmsk, slmskh, gaus,blno, blto &
+     ,outlat, outlon, me)
           elseif(fnaisc(1:8).ne.'        ') then
             call fixrdc(lugb,fnaisc,kpdais,kpd7,mon,slmskw, &
                        ais(1,nn),len,iret &
-     ,                 imsk, jmsk, slmskh, gaus,blno, blto &
-     ,                 outlat, outlon, me)
+     ,imsk, jmsk, slmskh, gaus,blno, blto &
+     ,outlat, outlon, me)
           else
             write(6,*) 'FATAL ERROR: climatological ice cover'
             write(6,*) 'file not given.'
@@ -4803,15 +4803,15 @@
           kpd7=-1
           call fixrdc(lugb,fnsnoc,kpdsno,kpd7,mon,slmskl, &
                      sno(1,nn),len,iret &
-     ,               imsk, jmsk, slmskh, gaus,blno, blto &
-     ,               outlat, outlon, me)
+     ,imsk, jmsk, slmskh, gaus,blno, blto &
+     ,outlat, outlon, me)
 !  snow cover
           if(fnscvc(1:8).ne.'        ') then
             kpd7=-1
             call fixrdc(lugb,fnscvc,kpdscv,kpd7,mon,slmskl, &
                        scv(1,nn),len,iret &
-     ,                 imsk, jmsk, slmskh, gaus,blno, blto &
-     ,                 outlat, outlon, me)
+     ,imsk, jmsk, slmskh, gaus,blno, blto &
+     ,outlat, outlon, me)
             write(6,*) 'climatological snow cover read in.'
           endif
 !  surface roughness
@@ -4827,8 +4827,8 @@
         kpd7=-1
         call fixrdc(lugb,fnzorc,kpdzor,kpd7,mon,slmskl, &
                    zor(1,nn),len,iret &
-     ,             imsk, jmsk, slmskh, gaus,blno, blto &
-     ,             outlat, outlon, me)
+     ,imsk, jmsk, slmskh, gaus,blno, blto &
+     ,outlat, outlon, me)
       endif
           do i = 1, len
 !                           set clouds climatology to zero
@@ -4843,8 +4843,8 @@
               kpd7=-1
               call fixrdc(lugb,fnvegc,kpdveg,kpd7,mon,slmskl, &
                          veg(1,nn),len,iret &
-     ,                   imsk, jmsk, slmskh, gaus,blno, blto &
-     ,                   outlat, outlon, me)
+     ,imsk, jmsk, slmskh, gaus,blno, blto &
+     ,outlat, outlon, me)
             else
               call fixrdc_tile(fnvegc, tile_num_ch, i_index, j_index, &
                               kpdveg, veg(:,nn), mon, len, me)
@@ -4880,8 +4880,8 @@
           kpd7=-1
           call fixrdc(lugb,fntsfc,kpdtsf,kpd7,mon,slmskw, &
                     tsf(1,k1),len,iret &
-     ,              imsk, jmsk, slmskh, gaus,blno, blto &
-     ,              outlat, outlon, me)
+     ,imsk, jmsk, slmskh, gaus,blno, blto &
+     ,outlat, outlon, me)
         endif
         mon2s = mon1s + 1
         wei1x = (dayhf(mon2s)-rjdayh2)/(dayhf(mon2s)-dayhf(mon1s))
@@ -4911,9 +4911,9 @@
            kpd7=-1
            do k = 1, 4
              call fixrdc(lugb,fnalbc,kpdalb(k),kpd7,kpd9,slmskl &
-     ,                 alb(1,k,m2),len,iret &
-     ,                 imsk, jmsk, slmskh, gaus,blno, blto &
-     ,                 outlat, outlon, me)
+     ,alb(1,k,m2),len,iret &
+     ,imsk, jmsk, slmskh, gaus,blno, blto &
+     ,outlat, outlon, me)
            enddo
         endif
 
@@ -4937,8 +4937,8 @@
               do k = 1, 4
                 call fixrdc(lugb,fnalbc,kpdalb(k),kpd7,mon,slmskl, &
                            alb(1,k,nn),len,iret &
-     ,                     imsk, jmsk, slmskh, gaus,blno, blto &
-     ,                     outlat, outlon, me)
+     ,imsk, jmsk, slmskh, gaus,blno, blto &
+     ,outlat, outlon, me)
               enddo
             else
               do k = 1, 4
@@ -4951,22 +4951,22 @@
           kpd7 = -1
           call fixrdc(lugb,fntsfc,kpdtsf,kpd7,mon,slmskw, &
                     tsf(1,nn),len,iret &
-     ,              imsk, jmsk, slmskh, gaus,blno, blto &
-     ,              outlat, outlon, me)
+     ,imsk, jmsk, slmskh, gaus,blno, blto &
+     ,outlat, outlon, me)
 !  soil wetness
           if (fnwetc(1:8).ne.'        ') then
             kpd7=-1
             call fixrdc(lugb,fnwetc,kpdwet,kpd7,mon,slmskl, &
                        wet(1,nn),len,iret &
-     ,                 imsk, jmsk, slmskh, gaus,blno, blto &
-     ,                 outlat, outlon, me)
+     ,imsk, jmsk, slmskh, gaus,blno, blto &
+     ,outlat, outlon, me)
           elseif (fnsmcc(1:8).ne.'        ') then
             if (index(fnsmcc,'global_soilmcpc.1x1.grb') /= 0) then ! the old climo data
               kpd7=-1
               call fixrdc(lugb,fnsmcc,kpdsmc,kpd7,mon,slmskl, &
                          smc(1,lsoil,nn),len,iret &
-     ,                   imsk, jmsk, slmskh, gaus,blno, blto &
-     ,                   outlat, outlon, me)
+     ,imsk, jmsk, slmskh, gaus,blno, blto &
+     ,outlat, outlon, me)
               do l=1,lsoil-1
                 do i = 1, len
                  smc(i,l,nn) = smc(i,lsoil,nn)
@@ -4990,8 +4990,8 @@
                 if (k==4) kpd7=25800  ! 100_200 cm
                 call fixrdc(lugb,fnsmcc,kpdsmc,kpd7,mon,slmask_noice, &
                            smc(1,k,nn),len,iret &
-     ,                     imsk, jmsk, slmskh, gaus,blno, blto &
-     ,                     outlat, outlon, me)
+     ,imsk, jmsk, slmskh, gaus,blno, blto &
+     ,outlat, outlon, me)
               enddo
               deallocate(slmask_noice)
             endif
@@ -5005,13 +5005,13 @@
           if (fnacnc(1:8).ne.'        ') then
             call fixrdc(lugb,fnacnc,kpdacn,kpd7,mon,slmskw, &
                        acn(1,nn),len,iret &
-     ,                 imsk, jmsk, slmskh, gaus,blno, blto &
-     ,                 outlat, outlon, me)
+     ,imsk, jmsk, slmskh, gaus,blno, blto &
+     ,outlat, outlon, me)
           elseif (fnaisc(1:8).ne.'        ') then
             call fixrdc(lugb,fnaisc,kpdais,kpd7,mon,slmskw, &
                        ais(1,nn),len,iret &
-     ,                 imsk, jmsk, slmskh, gaus,blno, blto &
-     ,                 outlat, outlon, me)
+     ,imsk, jmsk, slmskh, gaus,blno, blto &
+     ,outlat, outlon, me)
           else
             write(6,*) 'FATAL ERROR: climatological ice cover'
             write(6,*) 'file not given.'
@@ -5021,15 +5021,15 @@
           kpd7=-1
           call fixrdc(lugb,fnsnoc,kpdsno,kpd7,mon,slmskl, &
                      sno(1,nn),len,iret &
-     ,               imsk, jmsk, slmskh, gaus,blno, blto &
-     ,               outlat, outlon, me)
+     ,imsk, jmsk, slmskh, gaus,blno, blto &
+     ,outlat, outlon, me)
 !  snow cover
           if (fnscvc(1:8).ne.'        ') then
             kpd7=-1
             call fixrdc(lugb,fnscvc,kpdscv,kpd7,mon,slmskl, &
                        scv(1,nn),len,iret &
-     ,                 imsk, jmsk, slmskh, gaus,blno, blto &
-     ,                 outlat, outlon, me)
+     ,imsk, jmsk, slmskh, gaus,blno, blto &
+     ,outlat, outlon, me)
             write(6,*) 'climatological snow cover read in.'
           endif
 !  surface roughness
@@ -5045,8 +5045,8 @@
         kpd7=-1
         call fixrdc(lugb,fnzorc,kpdzor,kpd7,mon,slmskl, &
                    zor(1,nn),len,iret &
-     ,             imsk, jmsk, slmskh, gaus,blno, blto &
-     ,             outlat, outlon, me)
+     ,imsk, jmsk, slmskh, gaus,blno, blto &
+     ,outlat, outlon, me)
       endif
 !  vegetation cover
           if (fnvegc(1:8) .ne. '        ') then
@@ -5054,8 +5054,8 @@
               kpd7=-1
               call fixrdc(lugb,fnvegc,kpdveg,kpd7,mon,slmskl, &
                          veg(1,nn),len,iret &
-     ,                   imsk, jmsk, slmskh, gaus,blno, blto &
-     ,                   outlat, outlon, me)
+     ,imsk, jmsk, slmskh, gaus,blno, blto &
+     ,outlat, outlon, me)
             else
               call fixrdc_tile(fnvegc, tile_num_ch, i_index, j_index, &
                               kpdveg, veg(:,nn), mon, len, me)
@@ -5400,13 +5400,13 @@
 !! to be extracted from the description records.
       subroutine fixrdc(lugb,fngrib,kpds5,kpds7,mon,slmask,             &
                       gdata,len,iret                                   &
-     ,                imsk, jmsk, slmskh, gaus,blno, blto              &
-     ,                outlat, outlon, me)
+     ,imsk, jmsk, slmskh, gaus,blno, blto              &
+     ,outlat, outlon, me)
       use machine ,      only : kind_io8,kind_dbl_prec,kind_sngl_prec
       implicit none
       integer imax,jmax,ijmax,i,j,n,jret,inttyp,iret,imsk,              &
              jmsk,len,lugb,kpds5,mon,lskip,lgrib,ndata,lugi,me,kmami   &
-     ,       jj
+     ,jj
       real (kind=kind_io8) wlon,elon,rnlat,dlat,dlon,rslat,blno,blto
       character*500 fngrib
       real (kind=kind_io8) slmskh(imsk,jmsk)
@@ -5503,7 +5503,7 @@
 
         call setrmsk(kpds5,slmskh,imsk,jmsk,wlon,rnlat, &
                     data,imax,jmax,rlngrb,rltgrb,lmask,rslmsk &
-     ,                  gaus,blno, blto, kgds(1), kpds(4), lbms)
+     ,gaus,blno, blto, kgds(1), kpds(4), lbms)
                          inttyp = 0
         if(kpds5.eq.225) inttyp = 1
         if(kpds5.eq.230) inttyp = 1
@@ -5511,11 +5511,11 @@
         if(kpds5.eq.224) inttyp = 1
         if (me .eq. 0) then
         if(inttyp.eq.1) print *, ' nearest grid point used' &
-     ,   ' kpds5=',kpds5, ' lmask = ',lmask
+     ,' kpds5=',kpds5, ' lmask = ',lmask
         endif
         call la2ga(data,imax,jmax,rlngrb,rltgrb,wlon,rnlat,inttyp, &
                   gdata,len,lmask,rslmsk,slmask &
-     ,            outlat, outlon,me)
+     ,outlat, outlon,me)
         deallocate (rlngrb, stat=iret)
         deallocate (rltgrb, stat=iret)
         deallocate (data, stat=iret)
@@ -5529,8 +5529,8 @@
 !>\ingroup mod_sfcsub
       subroutine fixrda(lugb,fngrib,kpds5,slmask,                       &
                        iy,im,id,ih,fh,gdata,len,iret                   &
-     ,                 imsk, jmsk, slmskh, gaus,blno, blto             &
-     ,                 outlat, outlon, me)
+     ,imsk, jmsk, slmskh, gaus,blno, blto             &
+     ,outlat, outlon, me)
       use machine      , only : kind_io8,kind_dbl_prec,kind_sngl_prec
       implicit none
       integer nrepmx,nvalid,imo,iyr,idy,jret,ihr,nrept,lskip,lugi,      &
@@ -5715,7 +5715,7 @@
           if(nrept.gt.nrepmx) then
             if (me .eq. 0) then
               write(6,*) ' <warning:cycl> searching range exceeded.' &
-     ,                  ' may be wrong grib file given'
+     ,' may be wrong grib file given'
               write(6,*) ' <warning:cycl> fngrib=',trim(fngrib)
               write(6,*) ' <warning:cycl> terminating search and', &
                         ' and setting gdata to -999'
@@ -5745,7 +5745,7 @@
         allocate (rslmsk(imax,jmax))
         call setrmsk(kpds5,slmskh,imsk,jmsk,wlon,rnlat, &
                     data,imax,jmax,rlngrb,rltgrb,lmask,rslmsk &
-     ,                  gaus,blno, blto, kgds(1), kpds(4), lbms)
+     ,gaus,blno, blto, kgds(1), kpds(4), lbms)
 
                          inttyp = 0
         if(kpds5.eq.225) inttyp = 1
@@ -5754,7 +5754,7 @@
         if(inttyp.eq.1) print *, ' nearest grid point used'
         call la2ga(data,imax,jmax,rlngrb,rltgrb,wlon,rnlat,inttyp, &
                   gdata,len,lmask,rslmsk,slmask &
-     ,            outlat, outlon, me)
+     ,outlat, outlon, me)
       deallocate (rlngrb, stat=iret)
       deallocate (rltgrb, stat=iret)
       deallocate (data, stat=iret)
@@ -5787,7 +5787,7 @@
         endif
       enddo
       return
-      end
+      end subroutine snodpth2
 !>@}
 
       end module sfccyc_module
