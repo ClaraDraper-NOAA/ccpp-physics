@@ -127,7 +127,7 @@
      ,sihnew
 
       integer imsk,jmsk,ifp,irtscv,irtacn,irtais,irtsno,irtzor,         &
-             irtalb,irtsot,irtsoc,irtalf,j,irtvet,irtsmc,irtstc,irtveg,&  &
+             irtalb,irtsot,irtsoc,irtalf,j,irtvet,irtsmc,irtstc,irtveg,&
              irtwet,k,iprnt,kk,irttsf,iret,i,igrdbg,iy,im,id,          &
              lugb,len,lsoil,ih,                                        &
              irttg3,nlunit,sz_nml,ialb                                 &
@@ -186,7 +186,7 @@
      ,tg3clm(len), acnclm(len),   cnpclm(len)                      &
      ,cvclm (len), cvbclm(len),   cvtclm(len)                      &
      ,scvclm(len), tsfcl2(len),   vegclm(len)                      &
-     ,vetclm(len), sotclm(len), socclm(len),alfclm(len,2), sliclm(len)& &
+     ,vetclm(len), sotclm(len), socclm(len),alfclm(len,2), sliclm(len)&
      ,smcclm(len,lsoil), stcclm(len,lsoil)                         &
      ,sihclm(len), sicclm(len)                                     &
      ,vmnclm(len), vmxclm(len), slpclm(len), absclm(len)
@@ -1231,7 +1231,7 @@
         if (me == 0) write(6,*) 'idim,jdim=',idim,jdim &
      ,' gaus=',gaus,' blno=',blno,' blto=',blto
       else
-        if (me ==. 0) write(6,*) 'idim,jdim=',idim,jdim &
+        if (me == 0) write(6,*) 'idim,jdim=',idim,jdim &
      ,' gaus=',gaus,' blno=',blno,' blto=',blto
         write(6,*) ' FATAL ERROR in getgb : jret=',jret
         write(6,*) ' kpds(13)=',kpds(13),' kpds(15)=',kpds(15)
@@ -1444,7 +1444,7 @@
 !>\ingroup mod_sfcsub
 !! This subroutine conducts interpolation from lat/lon to Gaussian
 !! grid to other lat/lon grid.
-      subroutine la2ga(regin,imxin,jmxin,rinlon,rinlat,rlon,rlat,inttyp,& &
+      subroutine la2ga(regin,imxin,jmxin,rinlon,rinlat,rlon,rlat,inttyp,&
                       gauout,len,lmask,rslmsk,slmask                   &
      ,outlat, outlon,me)
       use machine , only : kind_io8,kind_io4
@@ -1477,18 +1477,18 @@
       len_thread_m  = (len+num_threads-1) / num_threads
 
       if (inttyp /=1) allocate (ifill(num_threads))
-!$omp parallel do default(none) 
-!$omp+private(i1_t,i2_t,len_thread,it,i,ii,i1,i2)
-!$omp+private(j,j1,j2,jq,ix,jy,nx,kxs,kxt,kmami)
-!$omp+private(alamd,denom,rnume,aphi,x,y,wsum,wsumiv,sum1,sum2)
-!$omp+private(sum3,sum4,wi1j1,wi2j1,wi1j2,wi2j2,wei1,wei2,wei3,wei4)
-!$omp+private(sumn,sums)
-!$omp+shared(imxin,jmxin,ifill)
-!$omp+shared(outlon,outlat,wrk,iindx1,rinlon,jindx1,rinlat,ddx,ddy)
-!$omp+shared(rlon,rlat,regin,gauout,imxnx)
-!$omp+private(tem)
-!$omp+shared(num_threads,len_thread_m,len,lmask,iindx2,jindx2,rslmsk)
-!$omp+shared(inttyp,me,slmask)
+!$omp parallel do default(none)  &
+!$omp private(i1_t,i2_t,len_thread,it,i,ii,i1,i2) & 
+!$omp private(j,j1,j2,jq,ix,jy,nx,kxs,kxt,kmami) &
+!$omp private(alamd,denom,rnume,aphi,x,y,wsum,wsumiv,sum1,sum2) &
+!$omp private(sum3,sum4,wi1j1,wi2j1,wi1j2,wi2j2,wei1,wei2,wei3,wei4) &
+!$omp private(sumn,sums) &
+!$omp shared(imxin,jmxin,ifill) &
+!$omp shared(outlon,outlat,wrk,iindx1,rinlon,jindx1,rinlat,ddx,ddy) &
+!$omp shared(rlon,rlat,regin,gauout,imxnx) &
+!$omp private(tem) &
+!$omp shared(num_threads,len_thread_m,len,lmask,iindx2,jindx2,rslmsk) &
+!$omp shared(inttyp,me,slmask)
       do it=1,num_threads   ! start of threaded loop ...................
         i1_t       = (it-1)*len_thread_m+1
         i2_t       = min(i1_t+len_thread_m-1,len)
@@ -1972,7 +1972,7 @@
                       smcanl,stcanl,slianl,scvanl,acnanl,veganl,       &
                       vetanl,sotanl,socanl,alfanl,tsfan0,              &
                       vmnanl,vmxanl,slpanl,absanl,                     &
-                      kpdtsf,kpdwet,kpdsno,kpdsnd,kpdzor,kpdalb,kpdais,& &
+                      kpdtsf,kpdwet,kpdsno,kpdsnd,kpdzor,kpdalb,kpdais,&
                       kpdtg3,kpdscv,kpdacn,kpdsmc,kpdstc,kpdveg,       &
                       kprvet,kpdsot,kpdsoc,kpdalf,                     &
                       kpdvmn,kpdvmx,kpdslp,kpdabs,                     &
@@ -1987,8 +1987,8 @@
       logical  lanom
       integer irtsmc,irtacn,irtstc,irtvet,irtveg,irtscv,irtzor,irtsno,  &
         irtalb,irttg3,irtais,iret,me,kk,kpdvet,i,irtalf,irtsot,irtsoc, &
-             imsk,jmsk,irtwet,lsoil,len,kpdtsf,kpdsno,kpdsnd,kpdwet,iy,& &
-        lugb,im,ih,id,kpdveg,kpdstc,kprvet,irttsf,kpdsot,kpdsoc,kpdsmc,& &
+             imsk,jmsk,irtwet,lsoil,len,kpdtsf,kpdsno,kpdsnd,kpdwet,iy,&
+        lugb,im,ih,id,kpdveg,kpdstc,kprvet,irttsf,kpdsot,kpdsoc,kpdsmc,&
              kpdais,kpdzor,kpdtg3,kpdacn,kpdscv,j                      &
      ,kpdvmn,kpdvmx,kpdslp,kpdabs,irtvmn,irtvmx,irtslp,irtabs
       real (kind=kind_io8) blto,blno,fh
@@ -2818,7 +2818,7 @@
                       vetfcs,sotfcs,socfcs,alffcs,                     &
                       sihanl,sicanl,                                   &
                       vmnanl,vmxanl,slpanl,absanl,                     &
-                      tsfanl,tsfan2,wetanl,snoanl,zoranl,albanl,aisanl,& &
+                      tsfanl,tsfan2,wetanl,snoanl,zoranl,albanl,aisanl,&
                       cvanl ,cvbanl,cvtanl,                            &
                       cnpanl,smcanl,stcanl,slianl,veganl,              &
                       vetanl,sotanl,socanl,alfanl,                     &
@@ -3473,10 +3473,10 @@
       enddo
       len_thread_m  = (jmxout+num_threads-1) / num_threads
       if (gaus) then
-!$omp parallel do private(j1_t,j2_t,it,j1,j2,jj)
-!$omp+private(aphi)
-!$omp+shared(num_threads,len_thread_m)
-!$omp+shared(jmxin,jmxout,gaul,rltout,jindx1,ddy)
+!$omp parallel do private(j1_t,j2_t,it,j1,j2,jj) &
+!$omp private(aphi) &
+!$omp shared(num_threads,len_thread_m) &
+!$omp shared(jmxin,jmxout,gaul,rltout,jindx1,ddy)
         do it=1,num_threads   ! start of threaded loop ...................
           j1_t       = (it-1)*len_thread_m+1
           j2_t       = min(j1_t+len_thread_m-1,jmxout)
@@ -3508,10 +3508,10 @@
         enddo             ! end of threaded loop ...................
 !$omp   end parallel do
       else
-!$omp parallel do private(j1_t,j2_t,it,j1,j2,jtem)
-!$omp+private(aphi)
-!$omp+shared(num_threads,len_thread_m)
-!$omp+shared(jmxin,jmxout,gaul,rltout,jindx1,ddy,dlati,blto)
+!$omp parallel do private(j1_t,j2_t,it,j1,j2,jtem) &
+!$omp private(aphi) &
+!$omp shared(num_threads,len_thread_m) &
+!$omp shared(jmxin,jmxout,gaul,rltout,jindx1,ddy,dlati,blto)
         do it=1,num_threads   ! start of threaded loop ...................
           j1_t       = (it-1)*len_thread_m+1
           j2_t       = min(j1_t+len_thread_m-1,jmxout)
@@ -3538,10 +3538,10 @@
         enddo             ! end of threaded loop ...................
 !$omp   end parallel do
       endif
-!$omp parallel do private(j1_t,j2_t,it,i,i1,i2)
-!$omp+private(j,j1,j2,x,y)
-!$omp+shared(num_threads,len_thread_m)
-!$omp+shared(imxout,iindx1,jindx1,ddx,ddy,gauin,regout)
+!$omp parallel do private(j1_t,j2_t,it,i,i1,i2) &
+!$omp private(j,j1,j2,x,y) &
+!$omp shared(num_threads,len_thread_m) &
+!$omp shared(imxout,iindx1,jindx1,ddx,ddy,gauin,regout)
       do it=1,num_threads   ! start of threaded loop ...................
         j1_t       = (it-1)*len_thread_m+1
         j2_t       = min(j1_t+len_thread_m-1,jmxout)
@@ -4223,9 +4223,9 @@
                       fntg3c,fnscvc,fnsmcc,fnstcc,fnacnc,fnvegc,       &
                       fnvetc,fnsotc,fnsocc,                            &
                       fnvmnc,fnvmxc,fnslpc,fnabsc,                     &
-                      tsfclm,tsfcl2,wetclm,snoclm,zorclm,albclm,aisclm,& &
+                      tsfclm,tsfcl2,wetclm,snoclm,zorclm,albclm,aisclm,&
                       tg3clm,cvclm ,cvbclm,cvtclm,                     &
-                      cnpclm,smcclm,stcclm,sliclm,scvclm,acnclm,vegclm,& &
+                      cnpclm,smcclm,stcclm,sliclm,scvclm,acnclm,vegclm,&
                       vetclm,sotclm,socclm,alfclm,                     &
                       vmnclm,vmxclm,slpclm,absclm,                     &
                       kpdtsf,kpdwet,kpdsno,kpdzor,kpdalb,kpdais,       &
